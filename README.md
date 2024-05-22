@@ -22,21 +22,7 @@
 
 - [JUC入门](/posts/JUC入门.md)
 
-  
 
+# 组会汇报
 
-
-​		
-
-
-
-
-
-
-
-
-
-
-
-
-
+- [温和地走进机器学习(一)](https://www.123pan.com/s/44PTjv-aHtrv.html)
