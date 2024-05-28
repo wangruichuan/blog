@@ -11,7 +11,7 @@
 ## 基础框架
 
 - [日志系统](posts/日志系统.md)
-- [Lombok](/posts/Lombok.md)
+- [Lombok](posts/Lombok.md)
 - [Knife4j](https://doc.xiaominfo.com/docs/quick-start)
 
 # Spring Framwork
@@ -20,9 +20,13 @@
 
 # JUC
 
-- [JUC入门](/posts/JUC入门.md)
+- [JUC入门](posts/JUC入门.md)
 
 
 # 组会汇报
 
 - [温和地走进机器学习(一)](https://www.123pan.com/s/44PTjv-aHtrv.html)
+
+# 数据库
+
+- [Mysql](posts/MySql.md)
