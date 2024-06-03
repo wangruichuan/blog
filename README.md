@@ -6,7 +6,7 @@
 
 ## Java基础
 
-- [JavaSE拾遗](post/JavaSE拾遗.md)
+- [JavaSE拾遗](posts/JavaSE拾遗.md)
 - [JavaWeb](posts/JavaWeb.md)
 
 ## 基础框架
