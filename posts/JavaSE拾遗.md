@@ -84,9 +84,11 @@ protect：子类+同一个包中的类
 
 ## 2.4 代码块
 
-分为两类，**静态代码块**和**普通代码块**：静态代码块随着类的加载而执行，并且只会执行一次。如果是普通代码块，每创建一个对象，就执行
+分为两类，**静态代码块**和**普通代码块**：静态代码块随着类的加载而执行，并且只会执行一次。如果是普通代码块，每创建一个对象，就执行，一个类中可以有多个代码块
 
 顺序：静态代码块>普通代码块>构造方法
+
+在静态域（静态方法，静态属性，静态代码块中），静态方法永远是最后执行的，跟顺序无关，而其他两个跟声明的顺序有关     
 
 ![image-20240602105631798](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240602105631798.png)
 
@@ -113,12 +115,14 @@ protect：子类+同一个包中的类
 
 5.final 和 static 往往搭配使用，效率更高，**不会导致类加载**
 
+6.final 不能修饰抽象类。
+
 ### 2.6 抽象类
 
 - 当父类的某些方法，需要声明，但是又不确定如何实现时，可以将其声明为抽象方法（没有方法体），那么这个类就是抽象类。
 - 当一个类中存在抽象方法时，需要将该类声明为abstract类。
 - 抽象类是不能实例化的。
-- 抽象类不一定要包含abstract方法
+- **抽象类不一定要包含abstract方法**
 - 如果一个类继承了抽象类，则它必须实现抽象类的所有抽象方法，除非它自己也声明为abstract类。
 - 抽象方法不能使用private、final 和 static来修饰，因为这些关键字都是和重写相违背的.
 - 抽象类与动态绑定结合
@@ -318,6 +322,8 @@ public class Test
 
 重名问题也是一样的：就近原则+如果想用外部类成员：**外部类名.this.变量名**
 
+内部类（也叫成员内部类）可以有4种访问权限
+
 ### 2.7.4 静态内部类
 
 静态内部类是定义在外部类的成员位置，并且有static修饰，可以**直接访问外部类的所有静态成员**，包含私有的.
@@ -497,7 +503,7 @@ public void test() throws IOException
 
 -128 到127，在这个范围内，并没有new新的Integer，类似枚举enum。
 
-也就是说，在-128到127这个范围中的数的对象是在数组中已经创建好了的，需要时是直接返回数组的对应的元素的对象的值，所以m，n的值是地址，但这个地址是一样的，但是如果你去new的话，是两个不相干的空间，地址肯定不一样
+也就是说，**在-128到127这个范围中的数的对象是在数组中已经创建好了的，需要时是直接返回数组的对应的元素的对象的值**，所以m，n的值是地址，但这个地址是一样的，但是如果你去new的话，是两个不相干的空间，地址肯定不一样
 
 ![image-20240603093451561](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240603093451561.png)
 
@@ -508,6 +514,29 @@ public void test() throws IOException
 一个特殊的情况：只要有基本数据类型，就是判断 值是否相等。这里应该是对i11自动拆箱了
 
 ![image-20240603093615172](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240603093615172.png)
+
+
+
+
+
+   各种比较：
+
+1. int和Integer比较，**Integer会自动拆箱**，== 和 equals都肯定为true    
+
+2. int和new Integer比较，Integer会自动拆箱，调用intValue方法, 所以 == 和 equals都肯定为true    
+
+3. Integer和Integer比较的时候，由于直接赋值的话会进行自动的装箱。所以当值在[-128,127]中的时候，由于值缓存在IntegerCache中，那么当赋值在这个区间的时候，不会创建新的Integer对象，而是直接从缓存中获取已经创建好的Integer对象。而当大于这个区间的时候，会直接new Integer。 
+    a.当Integer和Integer进行==比较的时候，在[-128,127]区间的时候，为true。不在这个区间，则为false 
+    b.当Integer和Integer进行equals比较的时候，由于Integer的equals方法进行了重写，比较的是内容，所以为true   
+4. **Integer和new Integer** ： new Integer会创建对象，存储在堆中。而Integer在[-128,127]中，从缓存中取，否则会new Integer. 
+    所以 Integer和new Integer 进行==比较的话，肯定为false ; Integer和new Integer 进行equals比较的话，肯定为true   
+5. ​    new Integer和new Integer进行==比较的时候，肯定为false ; 进行equals比较的时候，肯定为true 
+    原因是new的时候，会在堆中创建对象，分配的地址不同，==比较的是内存地址，所以肯定不同   
+6. ​    装箱过程是通过调用包装器的valueOf方法实现的 
+    拆箱过程是通过调用包装器的xxxValue方法实现的（xxx表示对应的基本数据类型）   
+
+7.    Byte、Short、Integer、Long这几个类的valueOf方法实现类似的。所以在[-128,127]区间内，==比较的时候，值总是相等的（指向的是同一对象），在这个区间外是不等的。 
+    而Float和Double则不相等， Boolean的值总是相等的   
 
 ## 5.3 **Object类**
 
@@ -555,3 +584,227 @@ public void test() throws IOException
 
 ## 6.1 String
 
+ 首先，String类本身就是final的，也就是不能被继承
+
+然后，String里有一个char数组，名称叫value，这个char数组是final，也就是说**value的值（char数组的地址）是不可以更改的**
+
+
+
+![image-20240606162636921](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606162636921.png)
+
+![image-20240606162728492](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606162728492.png)
+
+### 6.1.1 两种创建String对象的方式 
+
+1.  String s =”abc“
+
+   **先从常量池查看是否有"abc"数据空间，如果有，直接指向;**
+
+   **如果没有则重新创建，然后指向。s最终指向的是常量池的空间地址**
+
+2. 调用构造器
+
+   **先在堆中创建空间，里面维护了value属性，指向常量池的abc空间**
+
+   **如果常量池没有"hsp"，重新创建，如果有，直接通过value指向。**
+
+
+
+### 6.1.2 intern（）方法
+
+只要调用String对象的intern()，都会去找到字符串常量池，然后判断String对象的字符串内容是否已经存在常量池中，不存在，则往字符串常量池中创建该字符串内容的对象（JDK6及之前）或创建新的引用并指向堆区已有对象地址（JDK7之后），存在则直接返回。
+
+### 6.1.3 一些习题
+
+1. `String a = “hello” + “abc”`
+
+编译器会对这句话进行优化，只创建一个“helloabc” 对象
+
+2. `String a = “hello” `
+
+​	   `String b = “abc” `
+
+  	 `String c = a + b `
+
+ 这段代码，在执行时，会创建一个StringBuilder，将a和b加起来，然后再转成String赋值给c。
+
+1.先创建一个 StringBuilder sb =stringBuilder()
+
+2.执行sb.append("hello"); 执行sb.append("abc");
+
+3.String c= sb.tostring()
+
+**最后其实是c指向堆中的对象(String)value[]->池中"helloabc**“
+
+## 6.2 StringBuffer
+
+可变长度：也有个value数组，不过没final关键字了，效率低，之前value指向的是常量池，不过到现在就变成了都是堆的内存了
+
+## 6.3 StringBuilder
+
+可变长度，不保证同步，怎么理解？
+
+```java
+public class StringBuilderNotSyncExample {
+    public static void main(String[] args) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // 启动一个线程进行操作
+        new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                stringBuilder.append("A");
+            }
+        }).start();
+
+        // 同时在主线程中进行操作
+        for (int i = 0; i < 100; i++) {
+            stringBuilder.append("B");
+        }
+
+        System.out.println(stringBuilder.toString());
+    }
+}
+
+```
+
+在这个例子中，两个线程同时对 `StringBuilder` 进行操作，由于它不保证同步，可能会导致最终结果的不一致性和不可预测性。实际运行时，输出的结果可能会比较混乱，而不是按照严格的顺序依次添加 "A" 和 "B"。
+
+如果需要在多线程环境下保证同步操作，应该考虑使用 `StringBuffer` 或者通过其他同步机制来确保数据的一致性。
+
+如果换成StringBuffer，尽管也是多线程对 `StringBuffer` 进行操作，但由于 `StringBuffer` 是线程安全的，它内部实现了同步机制，所以最终输出的结果会是有规律的，比如类似 "ABABABAB..." 这样交替出现的情况。
+
+这就体现了 `StringBuffer` 在多线程环境下能保证操作的同步性和结果的确定性。
+
+# 七、集合
+
+![image-20240606165552255](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606165552255.png)
+
+![image-20240606165400244](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606165400244.png)
+
+![image-20240606165758633](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606165758633.png)
+
+## 7.1 Collection
+
+![image-20240606165840614](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606165840614.png)
+
+**迭代器** ：但凡是实现了Collection接口的，都可以使用迭代器（lterator），可以用于遍历数组
+
+**for增强循环**：也可以遍历。增强for本质上也是迭代器iterator，简化版的迭代器
+
+**Stream API**
+
+### 7.1.1 List
+
+最大特点：添加顺序和取出顺序是一样的，且可重复，支持索引
+
+![image-20240606170356529](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606170356529.png)
+
+
+
+其中，LinkedList的原理如下：不过（LinkedList作者都说这个东西没有用了）
+
+![image-20240606170701555](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606170701555.png)
+
+**Arraylist扩容机制**
+
+其中ArrayList和Vector基本上一样，只不过ArrayList线程不安全
+
+![image-20240606171018254](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606171018254.png)
+
+扩容时用到的是调用`Arrays.copyOf()`方法，会在堆中重新分配内存创建数组
+
+### 7.1.2 Set
+
+无序，不允许重复，**取出的顺序的顺序虽然不是添加的顺序，但是他也是固定的**。
+
+集合的各种方法：https://www.mubu.com/doc/3vo-qVQirMo
+
+如果想实现取出来的顺序和插入的顺序是一样的，需要使用**LinkedHashSet**（父类是）
+
+1. **HashSet**
+
+   HashSet 的底层实现依赖于 HashMap。当向 HashSet  中添加元素时，实际上是将元素作为键，而值通常是一个固定的对象（比如一个默认的 Object 对象）存储在 HashMap 中。可以存放null，但只能有一个。
+
+   问几个问题？
+
+   **hashset在添加一个元素时是如何做到的（其实与HashMap是一样）？**
+
+​		添加一个元素，先得到其hash值，找到存储数据表，看这个索引位置有没有存放元素，如果没有，直接加入；如果有，就调用equals比较，如果相同，就不添加，如果不同，就添加到后边，在JDK8之后**，如果一条链表的元素个数超过8，并且这个table的总体大小超过64之后**，会红黑树化。（数组+链表+红黑树）
+
+​		**扩容机制**
+
+​		第一次添加时，table数组扩容到16，有一个东西叫加载因子，**临界值**=16*加载因子（16* * 0.75 =12）
+
+​		如果到了临界值，就会扩容，table直接×2，变成32，新的临界值就变成了32×0.75 =24
+
+2. **LinkedHashSet**
+
+继承自HashSet，原理很简单。HashMap里面的链表变成双向了，这样就能按照插入顺序遍历了
+
+## 7.2 Map
+
+### 7.2.1 HashMap
+
+首先，hashmap有一个内部类，类名是 Node，用于存储键值对。
+
+HashMap  初始化时会创建一个指定初始容量的数组，通过对键进行一系列计算得到哈希值。当发生哈希冲突时，在对应索引位置创建节点并通过链表连接起来。随着冲突增多，当链表长度达到一定阈值时，会将链表转换为红黑树以提高性能。当元素数量超过负载因子与容量的乘积时，进行扩容。扩容时创建一个新的更大容量的数组，并将原有元素重新分布到新数组中。
+
+**EntrySet** 
+
+为了方便程序员遍历，还会创建 EntrySet 集合，类型是Entry，而一个Entry对象就有k，v
+
+`transient Set<Map.Entry<K,V>> entrySet;`
+
+entrySet 中，定义的类型是 `Map.Entry` ，但是实际上存放的还是 `HashMap$Node`
+
+因为   `static class Node<K,V> implements Map.Entry<K,V>`
+
+**遍历**
+
+1. 单独遍历key和value（直接取出所有的value和key）
+
+![image-20240606174443235](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606174443235.png)
+
+2. 先取出 所有的Key ，通过Key 取出对应的Value
+
+3. 通过entryset来获取
+
+![image-20240606174651025](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606174651025.png)
+
+**扩容机制**
+
+![image-20240606174818879](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606174818879.png)
+
+### 7.2.2 HashTable
+
+k和v都不能是null，hashtable实现了字典dictionary接口，另外，hashtable是线程安全的
+
+![image-20240606174926049](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606174926049.png)
+
+### 7.2.3 TreeMap（TreeSet）
+
+当我们使用无参构造器，创建TreeSet时，仍然是无序的。如果需要变成有序的。
+
+Treeset提供了一个构造器，可以传入一个**比较器**（匿名内部类）
+
+![image-20240606175045891](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606175045891.png)
+
+添加数据时
+
+![image-20240606175154072](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606175154072.png)
+
+**注意**：在添加新的元素时，**如果按照自定义的规则添加进去是相等的，那么这个元素是加不进去的**，比如说”我自定义的排序规则是字符串长度“，如果接下来有一个跟已有结点的长度相同的新节点，这个结点是加不进去的。就算不添加匿名内部类去比较，也不一定能添加完全相同的对象，比如string就自己实现了compareTo接口！！
+
+**去重机制比较**
+
+![image-20240606175311154](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606175311154.png)
+
+# 八、反射
+
+反射即允许对类的各种信息进行获取与解剖。
+
+![image-20240606175803052](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606175803052.png)
+
+![image-20240606175856147](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606175856147.png)
+
+各种方法建议用到再查，没必要背
