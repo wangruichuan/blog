@@ -78,21 +78,19 @@ protect：子类+同一个包中的类
 
 **多态数组**
 
-![image-20240602104743651](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240602104743651.png)
-
-多态形参：方法中的形参是父类，实参是子类
+**多态形参**：方法中的形参是父类，实参是子类
 
 ## 2.4 代码块
 
 分为两类，**静态代码块**和**普通代码块**：静态代码块随着类的加载而执行，并且只会执行一次。如果是普通代码块，每创建一个对象，就执行，一个类中可以有多个代码块
 
-顺序：静态代码块>普通代码块>构造方法
+顺序：**父子父父子子，静静普构普构**
 
 在静态域（静态方法，静态属性，静态代码块中），静态方法永远是最后执行的，跟顺序无关，而其他两个跟声明的顺序有关     
 
 ![image-20240602105631798](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240602105631798.png)
 
-构造器中隐藏着普通代码块：![image-20240602105502868](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240602105502868.png)
+构造器中隐藏着普通代码块
 
 ## 2.5 final
 
@@ -460,6 +458,26 @@ JDK内置的基本注解类型：
 
 这道题中，finally里没有了return语句，但是finally语句还是要必须执行。执行顺序：执行catch里的++i，然后执行finally里的++i，然后输出，但最终return的是临时变量temp=3。最终，i变成了4，return的是3
 
+
+
+>   规则： 
+>
+> ​    1.try块是必须的，catch块和finally块都是可选的，但必须存在一个或都存在。try块不能单独存在。 
+>
+> ​    2.try块里的语句运行中出现异常会跳过try块里其他语句，直接运行catch里的语句。 
+>
+> ​    3.无论try块中是否有异常，无论catch块中的语句是否实现，都会执行finally块里的语句。 
+>
+> ​    4.如果try块或catch块中有return语句，finally块里的语句会执行在try块或catch块中的return语句前。 
+>
+> ​    5.如果finally块里有return语句，则直接返回，而不执行try块或catch块里的return语句。 
+>
+> ​    6.只有一种办法不执行finally块里的语句，那就是调用System.exit(1);方法，即退出java虚拟机。 
+>
+>    
+>
+> ​    强调：finally块里的语句在try或catch里的人return前执行！！！
+
 ## 4.3 throws vs throw
 
 ```Java
@@ -807,4 +825,4 @@ Treeset提供了一个构造器，可以传入一个**比较器**（匿名内部
 
 ![image-20240606175856147](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240606175856147.png)
 
-各种方法建议用到再查，没必要背
+各种方法建议用到再查，没必要背oo
