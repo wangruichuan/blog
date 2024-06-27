@@ -214,5 +214,288 @@ https://arthas.aliyun.com/doc/quick-start.html  官网
 
 
 
-# 四、类加载器
+# 四、类加载器入门
 
+## 4.1 干啥的
+
+类加载器 只参与 **加载过程中的字节码获取并加载到内存** 这一部分
+
+
+
+![image-20240625084551964](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625084551964.png)
+
+![image-20240625084607009](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625084607009.png)
+
+## 4.2 分类
+
+分为两类，一类是Java代码中实现的，一类是Java虚拟机底层源码实现的。
+
+底层用的不是JAVA，更多是C++，用于加载程序运行时的基础类，保证Java程序运行中基础类被正确的加载。
+
+JDK中也默认提供了多种不同渠道的类加载器，可以自己定制
+
+其中，对于JAVA实现的类加载器，都继承于抽象类 ClassLoader。即所有Java实现的类加载器都需要集成ClassLoader这个抽象类。
+
+其中，在JDK8之中，有这样的几种类加载器
+
+![image-20240625085246366](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625085246366.png)
+
+其中：
+
+**扩展类加载器**：扩展Java中一些比较通用的类
+
+**应用程序加载器**：自己写的类，引用的jar包的类
+
+> 在arthas如何查看类加载器有哪些？
+>
+> ![image-20240625090144786](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090144786.png)
+
+### 4.2.1 启动类加载器
+
+![image-20240625090314986](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090314986.png)
+
+### 4.2.2 Java实现的
+
+包括扩展类加载器，应用程序加载器。
+
+它们的源码都位于`sun.misc.Launcher`中，是一个静态内部类。继承自`URLClassLoader`。
+
+通过目录或者指定jar包将字节码文件加载到内存中。
+
+![image-20240625090558592](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090558592.png)
+
+![image-20240625090610634](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090610634.png)
+
+# 五、双亲委派
+
+由于Java虚拟机中有多个类加载器，双亲委派机制的核心是**<u>解决一个类到底由谁加载的问题</u>**。
+
+![image-20240625090724798](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090724798.png)
+
+当需要加载一个类时，首先会询问自定义类加载器的父类加载器是否已经加载过该类，如果没有，再依次向上询问更高层级的父类加载器，直到到达最顶层的启动类加载器。如果最顶层的启动类加载器也没有加载过，那么就会按照相反的顺序，由顶向下进行加载，从启动类加载器开始尝试加载，依次向下传递，直到有一个类加载器成功加载该类。
+
+![image-20240625090817890](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090817890.png)
+
+**自底向上查找是否加载过：**
+
+![image-20240625090944376](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625090944376.png)
+
+第二次再去加载相同的类，仍然会向上进行委派，如果某个类加载器加载过就会直接返回。
+
+**自顶向下尝试加载：**
+
+![image-20240625091202881](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625091202881.png)
+
+## 5.1 机制详解
+
+先看几个问题
+
+1. 如果一个类重复出现在三个类加载器的加载位置，应该由谁来加载?
+
+```
+答：启动类加载器加载，根据双亲委派机制，它的优先级是最高的
+```
+
+2. String类能覆盖吗：在自己的项目中去创建一个java.lang.string类，会被加载吗
+
+    答：不能，例如，如果在自己的项目中创建了一个`java.lang.String`类，当程序运行时，JVM 会优先使用由启动类加载器加载的真正的`java.lang.String`类，而您自定义的同名类会被忽略。
+
+3. **在Java中如何使用代码的方式去主动加载一个类呢?**
+
+   ![image-20240625091722664](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625091722664.png)
+
+## 5.2 父类加载器
+
+![image-20240625092348934](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625092348934.png)
+
+## 5.3 面试：类的双亲委派机制是什么？
+
+![image-20240625092516827](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625092516827.png)
+
+## 5.4 打破双亲委派
+
+前两种重要
+
+![image-20240625093039771](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625093039771.png)
+
+### 5.4.1 自定义类加载器 ※
+
+> 双亲委派机制中，默认的类加载顺序是先让父类加载器尝试加载类，如果父类加载器无法加载，才由子类加载器去加载。
+>
+> 而当我们自定义类加载器并重写`loadClass`方法时，就能够完全掌控类的加载过程。我们可以决定在什么情况下、从何处去查找和加载类，而不再严格遵循父类加载器优先的规则。
+>
+> 以实现**热加载**功能为例：
+>
+> 通常，当一个类被加载后，如果对其进行了修改，JVM 会按照常规的类加载机制，不会重新加载修改后的类。但通过自定义类加载器，我们可以在检测到类被修改时，主动去重新查找并加载修改后的类字节码。
+>
+> 比如，我们可以指定一个特定的目录或者数据源来获取修改后的类字节码，然后通过自定义的逻辑将其加载到 JVM 中。这样，程序就能够使用到最新的类定义，实现了热加载的效果。
+>
+> 再举一个例子，如果我们希望从数据库中加载特定的类定义，也可以通过自定义类加载器，实现与常规文件系统不同的类加载来源和方式。
+>
+> 在默认情况下，`loadClass` 方法会先委托父类加载器尝试加载类，如果父类加载器无法加载，才会由当前类加载器进行加载。
+>
+> 而当我们重写 `loadClass` 方法时，就可以完全自定义类的加载流程。
+>
+> 例如，我们可能会直接在当前类加载器中进行类的查找和加载，而不先委托给父类加载器。或者，我们可能会按照与双亲委派机制完全不同的顺序去查找和加载类。
+>
+> 比如说，原本应该先让父类加载器尝试加载的类，我们在重写的 `loadClass` 方法中决定先在本地特定的位置查找并加载，而不管父类加载器是否已经加载过或者能否加载。
+>
+> 再比如，我们可能会根据类的某些特定属性或条件，来决定是由当前类加载器加载，还是委托给其他特定的类加载器，而不是遵循双亲委派默认的从父到子的顺序。
+>
+> 总之，重写 `loadClass` 方法使得我们能够跳出双亲委派机制预设的加载顺序和规则，从而实现对类加载过程的灵活控制，也就打破了双亲委派机制。
+
+视频地址：
+
+https://www.yuque.com/wangrc1218/ggnb4a/tuiivui7caf0hxus?singleDoc# 《自定义类加载器》
+
+自定义类加载器并且重写`loadclass`方法，就可以将双亲委派机制的代码去除。
+
+- 一个Tomcat程序中是可以运行多个Web应用的，如果这两个应用中出现了相同限定名的类，比如Servlet类Tomcat要保证这两个类都能加载并且它们应该是不同的类。
+- 如果不打破双亲委派机制，当应用类加载器加载 Web应用1 中的MyServlet之后，Web应用2中相同限定名的MyServlet类就无法被加载了。
+
+**核心思路：<u>不再走向上委派，向下加载的机制了</u>**
+
+![image-20240625093843306](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625093843306.png)
+
+那么，到底 如何自定义类加载器？
+
+> 在 Java 中，`ClassLoader` 类是所有类加载器的父类，而常见的三种类加载器分别是启动类加载器（Bootstrap ClassLoader）、扩展类加载器（Extension ClassLoader）和应用程序类加载器（Application ClassLoader），它们之间存在着层次和委托的关系。
+>
+> `ClassLoader` 不是启动类加载器（Bootstrap ClassLoader）的直接父类。
+>
+> 启动类加载器是由 JVM 自身实现的，它并非从 `java.lang.ClassLoader` 直接继承而来。
+>
+> 但从概念和类层次结构的角度来说，`ClassLoader` 可以被视为所有通过 Java 代码实现的类加载器的父类，只是启动类加载器是个特殊的存在，不遵循这个继承关系。
+
+拿我们做的就是看ClassLoader有四个方法
+
+![image-20240625094554034](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625094554034.png)
+
+![image-20240625095005837](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625095005837.png)
+
+
+
+```java
+protected Class<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException
+    {
+        synchronized (getClassLoadingLock(name)) {
+            // First, check if the class has already been loaded
+            Class<?> c = findLoadedClass(name);
+            if (c == null) {
+                long t0 = System.nanoTime();
+                try {
+                    if (parent != null) {
+                        c = parent.loadClass(name, false);
+                    } else {
+                        c = findBootstrapClassOrNull(name);
+                    }
+                } catch (ClassNotFoundException e) {
+                    // ClassNotFoundException thrown if class not found
+                    // from the non-null parent class loader
+                }
+
+                if (c == null) {
+                    // If still not found, then invoke findClass in order
+                    // to find the class.
+                    long t1 = System.nanoTime();
+                    c = findClass(name);
+
+                    // this is the defining class loader; record the stats
+                    PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                    PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                    PerfCounter.getFindClasses().increment();
+                }
+            }
+            if (resolve) {
+                resolveClass(c);
+            }
+            return c;
+        }
+```
+
+这段 Java 代码定义了一个 `loadClass` 方法，用于加载指定名称的类。 
+
+**方法的整体结构**：
+
+- 方法使用了同步块 `synchronized (getClassLoadingLock(name))` 来确保在加载类的过程中线程安全。
+
+- **类加载的步骤**： 
+
+  - 1. 首先，通过 `findLoadedClass(name)` 检查类是否已经被加载，如果已经加载则直接返回。 
+    2. 如果未加载，并且父类加载器 `parent` 不为空，尝试通过父类加载器加载类 `parent.loadClass(name, false)` 。
+    3. 如果父类加载器为空或者父类加载器未找到该类，通过 `findBootstrapClassOrNull(name)` 查找引导类。 
+    4.  如果仍然未找到，调用 `findClass(name)` 方法来查找和定义类。
+
+  **类的解析**： 如果 `resolve` 为 `true` ，调用 `resolveClass(c)` 来解析类。
+
+   **示例**： 假设我们有一个自定义的类加载器继承自这个类，当需要加载一个名为 `MyClass` 的类时，这个方法会按照上述步骤进行查找和加载。如果父类加载器能够成功加载，就直接使用父类加载器加载的结果；否则，自定义的类加载器中的 `findClass` 方法会负责最终的类查找和定义。 总体而言，这段代码实现了一个具有层次结构的类加载机制，并进行了相关的性能统计和类的解析处理。 
+
+
+
+**问题**：
+
+1. 两个自定义类加载器加载相同限定名的类，不会冲突吗?
+
+​		不会，在同一个java虚拟机中，只有 **相同类加载器+相同的类限定名** 才会被认为是同一个类
+
+2. 自定义类加载器父类怎么是AppClassLoader呢?
+
+   ![image-20240625095631095](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625095631095.png)
+
+   ![image-20240625095646619](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625095646619.png)
+
+------
+
+**正确的去实现一个自定义类加载器**
+
+![image-20240625095736902](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625095736902.png)
+
+### 5.4.2 利用线程上下文类加载器
+
+JDBC中使用了**DriverManager**来管理项目中引入的不同数据库的驱动
+
+DriverManager类位于rt.jar包中，由 **启动类加载器** 加载,
+
+我们看这其中的道道
+
+> DriverManager属于rt.jar是 启动类加载器 加载的。而用户jar包中的驱动需要由 应用类加载器 加载，这就违反
+> 了双亲委派机制。
+
+这违反了双亲委派机制，原因在于按照正常的双亲委派流程，应用类加载器应该先将加载请求委托给父类加载器（启动类加载器和扩展类加载器），如果它们都无法加载，应用类加载器才进行加载。
+
+但在这里，用户 `jar` 包中的驱动没有遵循这个流程，直接由应用类加载器加载，跳过了父类加载器的尝试。
+
+例如，假设我们有一个自定义的数据库驱动程序 `MyDriver` 放在用户的 `jar` 包中。按照双亲委派机制，应该先由启动类加载器和扩展类加载器尝试加载，但由于这些核心类加载器通常不了解和无法加载用户自定义的特定驱动，所以实际上是由应用类加载器直接加载了 `MyDriver` 。
+
+**问题**：
+
+DriverManager怎么知道jar包中要加载的驱动在哪儿?
+
+![image-20240625101002753](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101002753.png)
+
+jar包中的mysql到底是由谁加载的？
+
+![image-20240625101019072](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101019072.png)
+
+![image-20240625101413906](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101413906.png)
+
+![image-20240625101500309](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101500309.png)
+
+## 5.5 面试题
+
+1. 类加载器的作用是什么？
+
+   ![image-20240625101703924](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101703924.png)
+
+2. 有几种类加载器？
+
+   ![image-20240625101717368](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101717368.png)
+
+3. 什么是双亲委派机制?
+
+   ![image-20240625101730197](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101730197.png)
+
+4. 怎么打破双亲委派机制？
+
+![image-20240625101742708](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101742708.png)
