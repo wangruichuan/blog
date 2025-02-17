@@ -499,3 +499,109 @@ jar包中的mysql到底是由谁加载的？
 4. 怎么打破双亲委派机制？
 
 ![image-20240625101742708](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240625101742708.png)
+
+# 六、JVM的内存区域
+
+JVM需要先将字节码文件加载到内存中（类加载器），所以Java虚拟机要准备一块内存，去存放这些字节码文件中的类和接口。
+
+当然，如果创建对象，还要为这些对象的内存负责。**这块存放类和对象的区域，叫做 *运行时* 数据区域。**
+
+执行引擎（JNI,解释器，GC）去执行相应的指令
+
+------
+
+其中，运行时 数据区 可以分为两类： **线程共享**  和 **线程不共享**
+
+**线程共享：**
+
+1. 方法区
+2. 堆
+
+**线程不共享**
+
+1. 程序计数器
+2. JAVA虚拟机栈
+3. 本地方法栈
+
+
+
+**内存溢出**：程序在使用某一块内存区域时，存放的数据需要占用的内存大小超过了虚拟机能提供的内存上限。
+
+## 6.1 程序计数器
+
+每个线程会通过  程序计数器  记录  **当前要执行的的字节码指令的地址**。
+
+![image-20240710101643738](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710101643738.png)
+
+![image-20240710101713161](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710101713161.png)
+
+在多线程执行情况下，Java虚拟机需要通过  **程序计数器**  记录  **CPU切换前解释执行到那一句指令**  并继续解释运行。
+
+------
+
+**程序员无需对程序计数器做任何处理。**
+
+## 6.2 Java虚拟机栈
+
+执行方法要进栈，方法结束要出栈
+
+![image-20240710102909958](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710102909958.png)
+
+![image-20240710102942812](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710102942812.png)
+
+![image-20240710103206255](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710103206255.png)
+
+Java虚拟机栈随着线程的创建而创建，而回收则会在线程的销毁时进行。由于方法可能会在不同线程中执行，每个线程都会包含一个自己的虚拟机栈。
+
+------
+
+**栈帧的组成**
+
+1. 局部变量表：运行过程中存放所有的局部变量
+2. 操作数栈：虚拟机在执行指令过程中用来存放临时数据的一块区域
+3. 帧数据：主要包含动态链接、方法出口、异常表的引用
+
+### 6.2.1 局部变量表
+
+![image-20240710105403950](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710105403950.png)
+
+**起始pc**：什么时候能访问
+
+![image-20240710105455641](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710105455641.png)
+
+**槽**：栈帧中的局部变量表是一个数组，数组中每一个位置称之为**槽(slot)**，lonq和double类型占用两个槽，其他类型占用一个槽。
+
+
+
+**this**：
+
+![image-20240710105633766](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710105633766.png)
+
+**方法的参数**
+
+![image-20240710110014245](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710110014245.png)
+
+**局部变量 对槽的复用**
+
+![image-20240710111613676](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710111613676.png)
+
+### 6.2.2 操作数栈
+
+![image-20240710111722321](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710111722321.png)
+
+### 6.2.3 帧数据
+
+1. **动态链接**
+
+   ![image-20240710111941179](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710111941179.png)
+
+2. **方法出口**
+
+   ![image-20240710112024947](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710112024947.png)
+
+3. **异常表**
+
+![image-20240710112137313](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240710112137313.png)
+
+## 6.3 本地方法栈
+

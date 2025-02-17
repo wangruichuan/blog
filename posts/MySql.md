@@ -1,4 +1,4 @@
-# 一、基本概念
+# 一、基本概念 p30
 
 1. 字段属性：
 
@@ -58,6 +58,95 @@
    例如，在一些关键业务流程中，可能需要更强有力的锁定机制来确保不会出现任何意外的数据不一致情况，这时行锁定就可能是必要的补充。所以两者可以根据具体的业务需求和场景特点来结合使用或单独使用，以达到最佳的效果。
 
 3. **truncated**：在数据库中，“TRUNCATE”用于快速删除表中的所有数据并重置表的相关参数，比如自增索引等，它比逐行删除数据的效率要高很多。但需要注意的是，TRUNCATE 操作**无法回滚**，执行后数据将不可恢复。
+
+4. ibd格式
+
+   ![image-20240716093016535](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716093016535.png)
+
+5. sql基本操作：
+
+   ![image-20240716095755847](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716095755847.png)
+
+   ## 1.1 数据定义DDL
+
+   **DDL的应用范围**：创建库->定字段->创建表
+
+   DDL不涉及对数据的操作，而是关数据库的结构和元数据(容器)，有三个主要的关键字
+
+   1. **CREATE**：用于创建数据库、表、索引、视图等
+   2. **ALTER**: 用于修改数据库对象的结构，如修改表结构、添加列、删除列等
+   3. **DROP**: 用于修改数据库对象的结构，如修改表结构、添加列、删除列等
+
+   ------
+
+   **SQL命名规定和规范**：
+
+   1. 数据库名、表名 不能以数字开头
+   2. 不要包含空格,可以使用下划线
+   3. 如果要和系统的关键词重名，请使用**``**
+   4. 库、表、列名使用小写字母，使用下划线连接
+
+   ------
+
+   ### 1.1.2 库管理
+
+   **创建库**：
+
+   ![](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716101547661.png)
+
+   **查看和使用库**：
+
+   ![image-20240716101635847](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716101635847.png)
+
+   **修改库**：
+
+   ![image-20240716101717470](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716101717470.png)
+
+   **删除库**：
+
+   ![image-20240716101842664](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716101842664.png)
+
+   ### 1.1.2 表管理
+
+   ![image-20240716102216144](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102216144.png)
+
+   ![image-20240716102258112](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102258112.png)
+
+   ![image-20240716102345544](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102345544.png)
+
+   ![image-20240716103512230](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716103512230.png)
+
+   ![image-20240716103533882](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716103533882.png)
+
+   ### 1.1.3 字段类型
+
+   1. **整数**
+
+      ![image-20240716102723596](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102723596.png)
+
+   2. **浮点数**
+
+      ![image-20240716102838241](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102838241.png)
+
+   3. **定点数**
+
+      ![image-20240716102911510](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102911510.png)
+
+   4. **字符类型**
+
+      ![image-20240716102938167](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716102938167.png)
+
+      ![image-20240716103310322](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716103310322.png)
+
+   5. **时间类型**
+
+      可以理解为一个特殊格式的字符串
+
+      ![image-20240716103345624](https://cdn.jsdelivr.net/gh/wangruichuan/images@main/2024/image-20240716103345624.png)
+
+   ## 1.2 数据操纵DML
+
+   
 
    
 
