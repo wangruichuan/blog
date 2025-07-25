@@ -1,2 +1,2 @@
-* [A文件](zh-cn/a)
-* [B文件](zh-cn/b)
+* [首页](Readme.md)
+* [算法](algorithm/index.md)
