@@ -2,6 +2,9 @@
 https://jingping-ye.github.io/docsify-docs-zh
 
 # 图床
+
+https://www.superbed.cn/
+
 https://www.picgo.net/
 
 
