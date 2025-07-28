@@ -1,1 +1,2 @@
+- [Home](/)
 - [Github](https://github.com/wangruichuan)
