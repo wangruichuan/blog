@@ -2,6 +2,10 @@
 - null的结果是object（设计缺陷）
 - object的结果是object和function
 
+## 运算规则
+
+https://www.bilibili.com/video/BV18tM7ziEYv/
+
 ## 作用域
 
 定义：**变量与函数的可访问范围**
@@ -50,7 +54,7 @@ https://v.douyin.com/fbJX3ESHrEc/
 
 但是这个垃圾回收器，它有这么一个理念：虽然它不知道有些东西你用不用，但是它认为有一个东西，你将来一定不用，就是你 **自己都不可能访问到的东西**，垃圾回收器回收的是 你想用都用不了的东西。
 
-那具体它是怎么发现这些内存的，那有很多算法，比如说，像什么 引用计数、标记清楚、什么新生代、老生代...
+那具体它是怎么发现这些内存的，那有很多算法，比如说，像什么 引用计数、标记清楚（mdn文档：memory management）、什么新生代、老生代...
 
 但还是会残留一些，这些你明明已经不用了，但是你还能访问到的内存，这就叫做 内存泄露。
 
@@ -334,5 +338,16 @@ function factorial(n) {
    babel用的就是这种方式。
 
 
+## 面试题手写系列
+### 手写deepClone（TODO）
 
-## 手写deepClone
+https://www.bilibili.com/video/BV1m2zwYoEz2/
+https://www.bilibili.com/video/BV1tz42187Ln/
+
+### 数组的并集、交集、差集
+
+1. 并集：`Array.from(new Set([...arr1, ...arr2]))`
+2. 交集：这里为了避免出现重复的，套个个Set
+   `Array.from(new Set(arr1.filter(item => arr2.includes(item))))`
+3. 差集：并集 - 交集。
+   `Array.from(new Set(union.filter(item => !intersection.includes(item))))`
