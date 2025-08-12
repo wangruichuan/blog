@@ -1,3 +1,7 @@
+# 博客地址
+
+https://wangruichuan.github.io/blog/
+
 # docsify 中文文档
 https://jingping-ye.github.io/docsify-docs-zh
 

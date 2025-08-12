@@ -168,6 +168,40 @@
 
 ![](https://pic1.imgdb.cn/item/68896b8058cb8da5c8ee5018.png)
 
+当我们使用一个模块的导出结果时，需要使用一个require函数，里面传入路径，这个函数一运行，相当于运行这个模块，并有个函数的返回结果，也就是这个模块的导出结果。
+
+所以，理解CJS，必须要知道require函数。这个函数是node在本地实现的，这个模块接收一个路径参数，实际上做了这么几件事：
+
+1. 根据传递的模块路径，得到模块完整的绝对路径，获得一个唯一的模块id` moduleId`
+2. 判断缓存：根据id判断有没有缓存，之前有没有运行过，之前运行过的话，直接拿之前的。require函数这里就结束。
+3. 真正运行模块代码的辅助函数：把你模块里的代码放到一个函数里面。也就是意味着你在模块里的代码，实际上是在一个函数的环境里边，可以通过打印arguments查看
+   1. 这个辅助函数有五个参数：
+      1. exports:这就解释了为什么我们在模块里可以直接使用exports，因为它就是一个函数的参数啊。
+      2. require
+      3. module
+      4. __filename：得到这个模块的绝对路径
+      5. __dirname：得到这个模块目录的绝对路径
+4. 准备辅助函数的所需参数
+   - moudule对象：
+   ```javascript
+   var moudule = {
+      exports: {},
+   }
+   ```
+   - exports对象：
+   ```javascript
+   var exports = moudle.exports
+   ```
+   - __filename：moduleId模块id
+   - __dirname：mouduleId模块目录
+5. 运行这个函数：这里是通过call去调用的，this绑定的是exports对象
+6. 缓存模块：缓存module.exports对象
+7. 返回 module.exports
+
+那，接下来做下这道题吧！看看下边的这个模块的导出内容是什么
+
+![](https://pic1.imgdb.cn/item/68970e3858cb8da5c81490ca.png)
+
 #### 导出数据
 
 有两种方式：
