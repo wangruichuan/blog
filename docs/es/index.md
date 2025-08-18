@@ -271,6 +271,13 @@ function factorial(n) {
 ![](https://pic1.imgdb.cn/item/688c4ad858cb8da5c8f743aa.png)
 
 可以发现，只有第一次是call传过去的，这里其实还是涉及到执行上下文
+
+### call和apply的链式调用
+
+https://www.bilibili.com/video/BV1k4uBzDEaj/
+
+![](https://pic1.imgdb.cn/item/68a2fe5858cb8da5c830c7b9.png)
+
 ## 如何实现一个私有属性
 
 这里总结下所有的方法：
@@ -351,6 +358,24 @@ https://www.bilibili.com/video/BV1tz42187Ln/
    `Array.from(new Set(arr1.filter(item => arr2.includes(item))))`
 3. 差集：并集 - 交集。
    `Array.from(new Set(union.filter(item => !intersection.includes(item))))`
+
+### 手写forEach
+```javascript
+Array.prototype.myForEach = function(callback) { 
+  const len = this.length
+  if (typeof callback !== 'function') {
+    throw new TypeError('callback is not a function')
+  }
+  let k = 0
+  while (k < len) {
+    let pk = String(k)
+    if(prop in this){
+      const kValue = this[pk]
+      callback.call(this, kValue, k, this)
+    }
+  }
+}
+```
 
 
 ## 面向对象
@@ -574,11 +599,11 @@ new Product("Bread", 1.5, 5)
 ![](https://pic1.imgdb.cn/item/68a197b258cb8da5c82a76fb.png)
 
 
-### JS为何会阻碍渲染？
+#### JS为何会阻碍渲染？
 
 因为JS的计算和浏览器的渲染都在一个主线程内。
 
-### 优先级
+#### 优先级
 
 任务没有优先级，但消息队列是有优先级的
 
@@ -597,3 +622,282 @@ new Product("Bread", 1.5, 5)
 ![](https://pic1.imgdb.cn/item/68a19ad658cb8da5c82a8a6a.png)
 
 
+### Promise
+
+Promise的出现统一了JS中的异步实现方案，减少了心智负担，但并没有解决回调地狱。
+
+直接手写一遍就啥都知道了。
+
+
+
+### async/await
+
+状态机
+协程
+yield：可以理解为 generator生成器 的语法糖
+
+这里可以去看 babel 将async/await转译后的源码
+
+
+### requestAnimationFrame 
+
+出现的原因：解决setinterval的定时器间隔不稳定的问题
+
+60hz：1000/60 = 16.7ms
+
+requestAnimationFrame 并不是由JS控制的，由浏览器直接控制的，不会因为js代码导致当前这个任务时间间隔不准的问题，所以说这里它的本质解决方式采用系统时间间隔。
+
+和settimeout一样，只需要传入回调函数即可，不过这里的时间间隔是固定死了，就是16.67ms
+
+```javascript
+const timer = requestAnimationFrame(() => {
+  console.log('tick')
+})
+
+```
+
+这里的这个timer是定时的序列号，从1开始。
+
+
+demo：进度条
+
+![](https://pic1.imgdb.cn/item/68a2eae258cb8da5c82f7b2e.png)
+
+
+### requestIdleCallback
+
+https://www.bilibili.com/video/BV17TcqeoEYb/
+
+就是浏览器需要16.7ms去渲染一帧吗，有时候你可能10ms就计算完并渲染完，还剩下6.7ms的空余时间。
+
+这个闲置时间，你可以做别的事情
+
+![](https://pic1.imgdb.cn/item/68a2ed9c58cb8da5c82fa243.png)
+
+
+![](https://pic1.imgdb.cn/item/68a2edb658cb8da5c82fa3af.png)
+
+**rAF和rIC的先后问题**
+
+https://www.bilibili.com/video/BV1UR8Fz6EgN/
+
+
+## Worker
+
+### Web Worker
+
+**使用方法**：
+1. 指定一个js文件，注册为worker线程去执行
+2. 通过message事件和postMessage方法，接收和发送消息给worker线程，terminate方法关闭线程
+
+
+
+main.js
+
+```javascript
+const worker = new Worker('worker.js')
+
+// 拿到worker给的数据
+worker.addEventListener('message', (e)=>{
+    console.log("来自worker的数据", e.data);
+})
+
+// 发送数据给worker
+document.getElementById("btn").addEventListener("click", function() {
+    worker.postMessage('Greeting from Main.js');
+})
+
+// worker.terminate()
+```
+
+worker.js
+
+```javascript
+
+self.addEventListener('message', e => {
+    self.postMessage(e.data); // 将接收到的数据直接返回
+});
+
+```
+
+
+**在worker中引入其他js**
+
+在worker中，如果要用一些js的库，因为不能访问window作用域的变量，所以没法用主页面的js，需要通过如下写法来引入js。
+
+```javascript
+importScripts('test.js');
+```
+
+- 如果我们引入的库，有操作dom的行为，是会失败的，因为worker中的全局this不是window。
+
+- web worker引入脚本可以是跨域的。
+
+- partytown是一个基于web worker的框架，有兴趣可以去看一下。
+
+
+**在node中使用web worker**
+
+![](https://pic1.imgdb.cn/item/68a2e2df58cb8da5c82ef112.png)
+
+
+### Shared Worker
+
+最主要的区别还是port的一个区别，用来描述在这个上下文中的这个worker，shareworker会根据后边的路径作为一个唯一性的判定，即便你创建十次，你会发现都是执行的同一个worker。
+
+main.js
+```javascript
+const worker = new SharedWorker('worker.js')
+// 发送消息
+worker.port.postMessage('Greeting from Main.js');
+// 接收消息
+worker.port.onmessage = (e) =>{
+  console.log("来自worker的数据", e.data);
+}
+
+```
+
+worker.js
+
+```javascript
+self.onconnect = (e) =>{
+  let port = e.ports[0]
+  port.onmessage = (e) =>{
+    console.log("来自main的数据", e.data)
+  }
+}
+```
+
+不能操作dom，还是只能用来进行一些计算密集型的计算。
+
+### Service Worker
+
+`service worker`是浏览器内置的功能，是一个单独运行的线程，他不能操作dom，主要的作用是缓存资源和推送通知。
+
+`service worker`创建后与当前页面就没有关系了，这个worker就会作用于整个浏览器的一个常驻的线程，即使当前页面已经关闭了。
+
+而是作用于**整个域名+scope范围**，一个脚本对应的service worker在整个浏览器中只有一个，可以作用于多个tab页。
+
+![](https://pic1.imgdb.cn/item/68a2e08f58cb8da5c82ed18f.png)
+
+
+  
+
+#### 使用方法
+
+
+
+1. `register`方法是将指定的js文件注册为`service worker`，他会将这个js下载下来并在后台线程运行。
+   1. `register`第二个参数可以指定scope范围，默认是当前路径.
+   2. scope的作用是当打开其他tab也是这个scope范围内的话，这个service worker也会被激活，此时生效于多个页面。
+2. `message`回调的作用是监听来自`service worker`的消息，是主线程与worker通信的方式。
+3. `postMessage`方法作用是向worker线程发送数据，注意是**深拷贝**的，并不是共享内存。
+
+main.js
+
+```html
+<button id="btn">发送消息</button>
+<script>
+    var t = { id:99 };
+
+    // 注册 Service Worker
+    const registration = await navigator.serviceWorker.register('/23.05/sw/service-worker.js');
+    console.log('Service worker registered with scope: ', registration.scope);
+
+    // 监听从serviceworker线程发送到主线程的message
+    navigator.serviceWorker.addEventListener('message', function (e) {
+        console.log('service worker传到主线程的', e.data, e); 
+        console.log(t);
+    });
+
+    // postMessage方法，从主线程发送数据到worker，注意所有的发送数据都是深拷贝，而不是共享内存。避免并发问题
+    document.getElementById('btn').addEventListener('click', function() {
+        navigator.serviceWorker.controller.postMessage(t);
+    });
+</script>
+
+```
+
+
+然后我们来看service-worker.js怎么写的，主要是以生命周期函数的形式写了四个回调函数：
+
+1. `install`:在第一次主线程中register的时候触发，如果已经install过了的js，就不会再次触发了.
+2. `activate`:相同js文件在相同域，之后的注册不会再install，而是只触发activate。
+3. `fetch`:在主线程调用fetch函数的时候触发，返回值会作为主线程fetch的返回值，所以可以在这里做缓存替换。
+4. `message`和`postMessage`与主线程中类似，是和主线程通信用的。
+
+```javascript
+// 在worker中如果要使用js文件需要用importScript这种写法 可以是跨域的
+importScripts('test.js');
+
+// install事件，在第一次注册的时候会触发
+//  这里在install的时候进行了初始化，是将两个资源添加到了cache中
+//  caches是浏览器内置的缓存对象，addALL会立即请求该资源并进行缓存
+self.addEventListener('install', function(event) {
+    console.log('install事件')
+    event.waitUntil(
+      caches.open('v1').then(function(cache) {
+        return cache.addAll([
+          '/23.05/sw/index.html',
+          '/23.05/sw/api.json'
+        ]);
+      })
+    );
+});
+
+// active事件，在符合scope的页面打开后，就会激活，注意install只有一次，但是激活会有很多个页面激活
+//  也可以将一些初始化操作放到active中
+self.addEventListener('activate', (event) => {
+    console.log('activate事件，一般是新打开了页面', event)
+});
+
+// fetch事件，拦截fetch方法，当页面调用fetch方法，就会被拦截
+//  这里的逻辑是结合install中的缓存设置，来判断fetch的资源是否命中缓存实现加速，否则才真正调用fetch
+self.addEventListener('fetch', async (event) => {
+    console.log("拦截fetch", event);
+    const res = await caches.match(event.request.url);
+    if(res) {
+        return res;
+    } else {
+        return fetch(event.request); 
+    }
+});
+
+// 接收来自主线程的消息，并往主线程发送消息
+self.addEventListener('message', function (e) {
+    console.log('主线程传到service worker', e.data);
+    e.data.id ++;
+    setTimeout(()=>{
+        e.source.postMessage(e.data)
+    }, 5000)
+});
+
+```
+
+#### scoped 共享
+
+service worker是一个线程，对于一个js文件是一个单独的线程。
+
+多个tab加载的sw的js文件相同时，不会重复安装，所以只有一个线程。
+
+当打开了两个页面，他们是共用一个service worker的，当我们在一个页面中向sw发送消息，sw收到后调用console.log实际上是委托给所有符合条件的tab都进行打印的。
+
+而e.source.postMessage的source只是针对发送消息过来的页面，所以有下面现象： 我们在一个页面中发送了消息，另一个页面也打印了接收到了消息。但是返回的消息只有发送的这个页面有打印出来。
+
+
+所以我们得慎用console.log方法，因为会在所有的tab中都打印消息。
+
+因为这种共享的机制，也就使得sw是不能也不应该操作dom元素的，因为会有多个页面都用一个sw，操作哪个dom呢？
+
+目前sw主要作用还是缓存资源，众所周知浏览器对于http资源本来也是可以进行缓存的，这和手动的sw进行缓存的区别是什么呢。
+
+浏览器network缓存主要受控于资源的`response header: Cache-Control `中。
+
+
+#### 应用场景：前端更新部署后，如何通知用户刷新？
+
+
+https://www.bilibili.com/video/BV1A6hAzrEhL/
+
+
+其实轮询也行：自动检测更新 - https://www.bilibili.com/video/BV17ih7z6EXy/

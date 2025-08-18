@@ -107,54 +107,6 @@ PuerTS是腾讯游戏团队打造的 Unity/Unreal/Dotnet 下的TypeScript编程�
 
 当然，前端不能做性能优化。但是，我们可以通过一些手段去做体验优化，这个也是非常重要的一点，就比如说这种图片懒加载，可能会让你浏览更丝滑等等。
 
-## Cookie的坑
-
-
-
-### SameSite
-
-![](https://pic1.imgdb.cn/item/68931f1258cb8da5c809ab90.png)
-
-用于限制跨站请求，如果请求的域和我页面的域不一致，那SameSite属性就会起作用，对这些请求做一些限制是否发送Cookie，由这个属性来决定是否发不发。
-
-![](https://pic1.imgdb.cn/item/68931fbe58cb8da5c809adc8.png)
-
-第五个就有点离谱，涉及到一个东西叫 公共后缀。
-
-取值：
-① None ：一旦设置为none，就必须使用https，会有csrf攻击
-② Lax：宽松的：阻止所有的跨站请求，但是对超链接放行，点这个超链接的时候要不要带过去cookie
-③ Strict：严格：阻止所有的跨站请求，对超链接不放行，场景就是“如果网站的删除用户信息是get的，伪装链接点下 可以直接发送get请求删除用户信息”
-
-## 站点域/公共后缀
-
-`Set-Cookie:...;domain=www.example.com;`
-
-https://www.bilibili.com/video/BV1shRnYyEkr/
-
-
-
-## HTMLCollection & NodeList 的区别
-- HTMLCollection：DOM对象集合，是一个伪数组，特点就是这个数组是实时的，这个集合里的东西是始终跟当前页面上的元素是挂钩的。对应的一个现象就是，如果说我用一个变量去存住一个HTMLCollection，那么这个变量里的东西，如果页面上的元素被删除了，那么这个变量里的东西就会变成null。这就会导致一些超出预期的行为。
-- NodeList：如果我们使用新的API `querySelectorAll`，那么返回的是NodeList。尽管仍然是一个伪数组，但是不跟页面绑定了，你把页面上的元素删了，它dom对象还在，甚至你将来加回去都可以。
-
-
-## 如何实现精确的setInterval（待完善）
-
-![](https://pic1.imgdb.cn/item/68a19b2958cb8da5c82a8cd0.png)
-
-https://www.bilibili.com/video/BV1Dm62YZEeS/?spm_id_from=333.1387.favlist.content.click&vd_source=d6026c8520318ca0d70d62989ee23568
-
-谈这个问题前，你得首先搞懂清楚setTimeout为什么不是完全精准的定时器。其实这考的还是事件循环。
-
-1. 事件循环影响回调时机，如果有同步阻塞的话，这个肯定是精确不了的
-2. 4ms最小时间(嵌套五层以上以后)
-3. 失活页面间隔会被调整为1s
-
-这里给出解决方案：
-1. 通过```performance.now```调整偏差：每次回调运行的时候调整这个偏差，调整一下时间间隔
-2. ```requestAnimationFrame```：渲染帧
-3. ```web worker```
 
 ## 写业务vs写框架
 
@@ -217,6 +169,38 @@ vue源码有一个工具方法：```hasChanged```，传入两个参数x,y，判�
       2. 基于请求的url和method去生成一个key（判断两次是否是同一个请求）
       3. 把正在请求中的请求给缓存到集合中，也就是要缓存正在pending状态的请求
 
+## 单点登录SSO
+
+https://www.bilibili.com/video/BV1UaKtzdEzG/
+
+需求背景：公司里有很多产品线，有很多系统，总不能每个系统都维护一套用户吧。因此需要对用户中心进行一个抽离，标准做法是CAS,OAuth2.0。但具体到技术层面，最终要么是Session + Cookie 模式，要么是双Token模式。
+
+### Session + Cookie 模式
+![](https://pic1.imgdb.cn/item/68a3048658cb8da5c831138f.png)
+
+优势：强控制力，说让你下线就下线
+缺点：成本太高了，认证中心压力很大，还要做session的集群，还要做容灾，因为认证中心一挂就全完了
+
+### 单Token模式
+
+![](https://pic1.imgdb.cn/item/68a3054c58cb8da5c83118ee.png)
+
+1. 首先访问认证中心，拿到一个token，可以用jwt
+2. 然后访问子系统时，子系统可以自行进行鉴权，不需要去询问认证中心
+
+缺点：对用户的控制力在减弱，设置多久的过期时间呢？
+
+
+### 双token模式
+![](https://pic1.imgdb.cn/item/68a3067a58cb8da5c8312117.png)
+
+![](https://pic1.imgdb.cn/item/68a306dd58cb8da5c83123cf.png)
+
+登录之后。拿到两个token，一个是过期时间短的token，一个是过期时间长的token。
+
+用户拿着这个短的token去拿资源，将来如果说过期时间到了。会拿着长token去访问认证中心去询问，你给我换一个短token。
+
+其实咋回事呢，就是它希望用户每隔一小段时间来一次，方便我控制
 
 ## SlideV ：为开发者打造的PPT工具
 

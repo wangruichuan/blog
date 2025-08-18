@@ -7,6 +7,8 @@
 - [六年之约](other/express.md)
 - [JS](es/index.md)
 - [CSS](css/index.md)
+- [浏览器/HTML](html/index.md)
 - [Git](other/git.md)
+- [运维](gongchenghua/yunwei.md)
 - [英语](language/english.md)
 - [日语](language/japanese.md)

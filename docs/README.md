@@ -17,3 +17,9 @@ https://imgloc.com/
 # 各种命令
 
 - 项目预览：docsify serve docs
+
+
+# 待更新
+
+- 学习mermaid
+- 学习运维的知识
