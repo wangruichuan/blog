@@ -351,3 +351,249 @@ https://www.bilibili.com/video/BV1tz42187Ln/
    `Array.from(new Set(arr1.filter(item => arr2.includes(item))))`
 3. 差集：并集 - 交集。
    `Array.from(new Set(union.filter(item => !intersection.includes(item))))`
+
+
+## 面向对象
+
+### 访问器成员
+
+这个点是其他语言所不都具备的一个点。
+
+先看场景：一个Product类，有商品单价和商品数量两个属性，我们要计算总价，于是写了这么一个方法`getTotal()`：数量*单价 = 总价
+
+但是你仔细推敲，你会觉得有一个地方不是那么舒服，总价他是上一个名词，按道理来说的话，他应该作为一个属性来书写，但是你一旦把它作为一属性，就又会产生数据冗余的问题，这时就需要一个办法，能不能**让他长得看起来像属性**
+
+
+**Object.defineProperty**
+
+![](https://pic1.imgdb.cn/item/689fe64258cb8da5c82833ca.png)
+
+
+这样一来，就相当于给类填了一个属性叫**totalPrice**，这个属性本质上他是一个方法，但是你用的时候可以当成属性来用，一旦读了这个属性，就相当于调用了get方法
+
+
+ES6里有对应的语法糖，直接一个GET就完事
+
+![](https://pic1.imgdb.cn/item/689fe6db58cb8da5c82833fb.png)
+
+### 原型
+
+原型出现的原因本质上是为了支持面向对象。
+
+![](https://pic1.imgdb.cn/item/689fe30e58cb8da5c8283337.png)
+
+![](https://pic1.imgdb.cn/item/689fe33258cb8da5c828333c.png)
+
+https://www.bilibili.com/video/BV1nZKceyET8/
+
+### 如何对一个Class降级
+
+来看一个Class，ES6时的语法
+
+```javascript
+class Product {
+    static count = 0;
+
+    constructor(name, unitPrice, number) {
+        this.name = name;
+        this.unitPrice = unitPrice;
+        this.number = number;
+        Product.count++;
+    }
+
+    get totalPrice() {
+        return this.number * this.unitPrice;
+    }
+
+    increase(){
+      this.number++;
+    }
+
+
+}
+```
+
+先看一个30分的写法：
+
+![](https://pic1.imgdb.cn/item/689fe87a58cb8da5c8283430.png)
+
+
+**作用域死区**：ES6中的类，和let/const 一样是有作用域死区的，就是你不能在初始化这个类之前去调用，但是你用这种写法的话，是可以访问的，因为函数有提升，我们无法在ES5的环境下模拟ES6的暂时性死区。
+
+但我们可以把这些代码改造成一个变量，然后用立即执行函数，把这段代码放到立即执行函数里，函数返回这个构造函数，虽然不能完全模拟ES6的暂时性死区，但是这时候你提前访问时，拿到的是undefined，当成构造函数去访问时会报错。
+
+![](https://pic1.imgdb.cn/item/689fe9e458cb8da5c828346f.png)
+
+好，现在已经四十分了
+
+
+**new的处理**
+
+在ES6中，对于用class，必须用new去构造，不能去直接调用这个函数，是会报错的，所以这里需要判断一下是不是通过new来调用的：这里的方法是通过判断 this的原型是不是等于该类的prototype
+
+![](https://pic1.imgdb.cn/item/689feaa858cb8da5c82834a4.png)
+
+好，现在是50分了。
+
+
+**访问器的处理**
+
+使用Object.defineProperty()来定义属性即可。
+
+![](https://pic1.imgdb.cn/item/689feaf258cb8da5c82834b8.png)
+
+
+这里需要注意一个小点，es6的get语法糖定义的访问器属性会存在两个地方，一个是实例上，一个是原型上。所以这里不仅要在外部用Object.defineProperty()，也要在构造函数内部去调用一下。
+
+![](https://pic1.imgdb.cn/item/689feb8558cb8da5c82834dd.png)
+
+到现在，已经60分了，及格了。
+
+不可枚举
+
+我们观察到，ES6里的访问器属性在打印的时候会有淡淡的颜色，这个淡淡的颜色表示不可枚举（无法通过类似for in，Object.keys()方法来获取）。所以在定义这个访问器属性时，还要加一个属性 enumerable: false，不可枚举
+
+![](https://pic1.imgdb.cn/item/689fec9158cb8da5c8283510.png)
+
+方法也是不可枚举的。故需要改造下
+
+
+![](https://pic1.imgdb.cn/item/689fedbd58cb8da5c8283580.png)
+
+八十分了
+
+**处理类中的方法**
+
+ES6中的类中方法只能不能当成构造函数，即不能通过new去调用。
+
+![](https://pic1.imgdb.cn/item/689fedf558cb8da5c828358d.png)
+
+所以你在调用这个函数的时候，你也要进行判断，是不是通过new去调用的。
+
+这里需要判断一下，this是否等于这个函数的原型，如果是，则说明通过new去调用的。
+
+![](https://pic1.imgdb.cn/item/689feebd58cb8da5c82835dd.png)
+
+
+好，现在就90分了，剩下的十分留着，因为会考察一些继承的转换。ES6到ES5的。
+
+
+完整代码：
+
+```javascript
+var Product = (function () {
+    function Product(name, unitPrice, number) {
+        /**
+         * getPrototypeOf : 用于获取指定对象的原型（即其 [[Prototype]]内部属性）
+         * const obj = {};
+         * const prototype = Object.getPrototypeOf(obj);
+         * console.log(prototype === Object.prototype); // true
+         */
+        if (Object.getPrototypeOf(this) !== Product.prototype) {
+            throw new Error("Cannot construct Product instances directly");
+        }
+        this.name = name;
+        this.unitPrice = unitPrice;
+        this.number = number;
+
+        Object.defineProperty(this, "totalPrice", {
+            get() {
+                return this.unitPrice * this.number;
+            },
+            enumerable: false
+        });
+        Product.count++
+    }
+    Product.count = 0
+    Product.prototype.increase = function () {
+        this.number++;
+    }
+    Object.defineProperty(Product.prototype, "totalPrice", {
+        get() {
+            return this.unitPrice * this.number;
+        },
+        enumerable: false
+    });
+    Object.defineProperty(Product.prototype, "increase", {
+
+        enumerable: false,
+        value: function () {
+            if (Object.getPrototypeOf(this) === Product.increase.prototype) {
+                throw new TypeError("it is not a constructor")
+            }
+            this.number++;
+        }
+    });
+
+    return Product;
+})
+
+new Product("Bread", 1.5, 5)
+```
+
+### 手写new操作符
+
+
+## 异步
+
+### 浏览器的进线程模型
+
+> 一个进程至少有一个线程，所以在进程开启后会自动创建一个线程来运行代码，该线程称之为**主线程**。
+
+> 如果程序需要同时执行多块代码，主线程就会启动更多的线程来执行代码，所以一个进程中可以包含多个线程。
+
+**浏览器是一个多进程多线程的应用程序。**
+
+有三个进程：浏览器进程，渲染进程（一个标签页就是一个渲染进程），网络进程。
+
+渲染进程启动后，会开启一个**渲染主线程**，主线程负责执行HTML、CSS、JS代码。
+
+#### 渲染主线程
+
+
+渲染主线程要负责很多的事情，那就会有一个难题：如何调度任务？
+
+比如：
+- 我正在执行一个 JS 函数，执行到一半的时候用户点击了按钮，我该立即去执行点击事件的处理函数吗?
+- 我正在执行一个 JS 函数，执行到一半的时候某个计时器到达了时间，我该立即去执行它的回调吗?
+- 浏览器进程通知我“用户点击了按钮"，与此同时，某个计时器也到达了时间，我应该处理哪一个呢?
+
+渲染主线程想到了一个绝妙的主意来处理这个问题：排队
+
+![](https://pic1.imgdb.cn/item/68a195bb58cb8da5c82a66b4.png)
+
+
+1. 最开始的时候，渲染主线程会进入一个无限的循环。
+2. 每次循环，检查消息队列是否有任务。如果有，就取出一个执行，执行完成后进入下一次循环；如果没有，则进入休眠状态。
+3. 其他所有线程可以随时向消息队列添加任务，在添加任务时，如果主线程是休眠状态，则会将其唤醒以继续循环拿任务。
+
+整个过程，称为 “**事件循环**”。
+
+面试题：如何理解JS的异步？
+
+![](https://pic1.imgdb.cn/item/68a197b258cb8da5c82a76fb.png)
+
+
+### JS为何会阻碍渲染？
+
+因为JS的计算和浏览器的渲染都在一个主线程内。
+
+### 优先级
+
+任务没有优先级，但消息队列是有优先级的
+
+每个任务都有一个任务类型，同一个类型的任务在一个队里。
+
+在一次事件循环中，浏览器会根据情况从不同的队列中取出任务执行。
+
+
+- 微队列：任务优先级最高。可以通过Promise、MutationObserver 添加
+- 交互队列：用于存放用户操作产生后的事件回调，优先级高。
+- 延时队列：计时器的回调，优先级中
+  
+
+面试题：讲下JS的事件循环吧
+
+![](https://pic1.imgdb.cn/item/68a19ad658cb8da5c82a8a6a.png)
+
+
