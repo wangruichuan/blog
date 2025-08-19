@@ -202,6 +202,8 @@ https://www.bilibili.com/video/BV1UaKtzdEzG/
 
 其实咋回事呢，就是它希望用户每隔一小段时间来一次，方便我控制
 
+https://www.bilibili.com/video/BV1BH4y1n7Ju/
+
 ## SlideV ：为开发者打造的PPT工具
 
 官网：https://cn.sli.dev/

@@ -1,3 +1,18 @@
+## 模版标记
+
+https://www.bilibili.com/video/BV1Aph7znE2r/
+
+![](https://pic1.imgdb.cn/item/68a3e3fa58cb8da5c8349aa4.png)
+
+
+这里的tag其实是一个函数，本质上这个标记就是一个函数调用，它在帮你调这个tag函数，拿到tag函数的返回结果，然后赋值给变量。
+
+会传递一系列的参数，第一个参数是一个数组，这个数组就是被表达式分割出来的数组，后续的表达式是依次表达式的结果
+
+![](https://pic1.imgdb.cn/item/68a3e48f58cb8da5c834a29a.png)
+
+![](https://pic1.imgdb.cn/item/68a3e4af58cb8da5c834a44d.png)
+
 ## 数据类型与typeof 并非一一对应
 - null的结果是object（设计缺陷）
 - object的结果是object和function
@@ -144,7 +159,16 @@ m()
 运行完成，块级作用域的词法环境销毁，之前的词法环境又回到执行上下文了（类似于一个栈的关系），其实执行上下文是没变，词法环境一直在变，这块其实也涉及到了闭包的实现。
 
 
+## Proxy
 
+https://www.bilibili.com/video/BV15bEkzuEsC/
+
+
+https://www.bilibili.com/video/BV11uK3zqEHv/?spm_id_from=333.1387.favlist.content.click
+
+## 迭代器
+
+https://www.bilibili.com/video/BV1hwTkzqEHg/
 
 
 ## 函数中的this指向

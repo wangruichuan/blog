@@ -45,6 +45,9 @@ https://www.bilibili.com/video/BV1shRnYyEkr/
  ![](https://pic1.imgdb.cn/item/68a31bb558cb8da5c831b286.png)
 
 
+ https://www.bilibili.com/video/BV1Qe41167wq/
+
+
 ## HTMLCollection & NodeList 的区别
 - HTMLCollection：DOM对象集合，是一个伪数组，特点就是这个数组是实时的，这个集合里的东西是始终跟当前页面上的元素是挂钩的。对应的一个现象就是，如果说我用一个变量去存住一个HTMLCollection，那么这个变量里的东西，如果页面上的元素被删除了，那么这个变量里的东西就会变成null。这就会导致一些超出预期的行为。
 - NodeList：如果我们使用新的API `querySelectorAll`，那么返回的是NodeList。尽管仍然是一个伪数组，但是不跟页面绑定了，你把页面上的元素删了，它dom对象还在，甚至你将来加回去都可以。
