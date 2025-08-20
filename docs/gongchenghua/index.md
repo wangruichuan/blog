@@ -54,7 +54,11 @@
 
 ## Vite
 
+### 详细说说 Vite 工程化配置细节，常见配置和优化手段
 
+> Bundleless（无打包，少打包）​​ 是一种现代前端开发模式，指在开发或生产环境中跳过传统打包工具（如 Webpack、Rollup）的代码合并与压缩步骤，直接使用浏览器原生支持的 ES Modules（ESM）加载单个文件。
+
+![](https://pic1.imgdb.cn/item/68a5224c58cb8da5c83ae275.png)
 
 ## 静态资源处理
 
@@ -174,7 +178,7 @@
 
 - CommonJS
 - ES6 模块化
-- AMD CMD
+- AMD CMD UMD
 
 ### CommonJS
 
@@ -390,6 +394,113 @@ console.log(sum) //3
    2. 直接去看这个文件夹下边有没有一个文件叫做 index.js 或者 index.json
 3. 内置模块: 如果你是直接书写，那你会判断你书写的模块是不是内置的模块，像fs，path，http，那就直接拿给你，如果不在，就会被认为是第三方的模块。
 4. 第三方模块:会去当前目录下的node_modules目录中去找，如果当前目录没有，会依次往上层目录里去找，直到找到我们磁盘的根目录。需要注意的是，在进入node_modules后，又会进入 这种 文件/文件夹 查找的模式
+
+### AMD CMD
+
+在node退出cjs规范后，浏览器端此时还并没有相应的模块化规范，但为何浏览器不直接选择现成的CJS规范，有以下两点原因：
+1. CJS非官方标准，浏览器厂商看不上，不愿意提供支持
+2. CJS读取模块内容是同步的，在node的视角下，所有的文件都在本机，其实速度就还好，但是如果在浏览器视角下，绝大部分的文件都需要用http远程获取，此时cjs的同步机制就显得很影响运行性能了。
+
+基于以上两点规范，社区就提出了一些方法去解决上述问题
+1. 远程加载JS做成异步的，加载完成后调用一个回调即可
+2. CJS中，模块中的代码需要放到函数中去执行，那在浏览器端只需要在编写代码时，直接放到函数中就好
+
+基于上述思路，就诞生了AMD 和 CMD
+
+#### AMD
+asynchronous module definition 异步模块加载机制
+
+就是你可以去下载一个 `require.js`，这个js就实现了AMD规范
+
+使用方法：
+
+```html
+<script src='./require.js' data-main="index.js" ></script>
+```
+这里的`data-main`写的是入口文件的路径，require.js 到时候就会读取 index.js 的文件
+
+
+无论你需要导出还是导入，你都需要require.js 提供的一个全局的方法，叫做define()
+
+导出：
+```javascript
+define({a:1,b:2})
+
+define(function (){
+   var a = 1
+   var b = 123
+   return {
+      a:123
+   }
+})
+
+// 第二种方式，类似cjs
+
+define(function (require,exports,module){
+   moudule.exports = {
+      name:'b模块',
+      data:'b模块的数据'
+   }
+})
+
+```
+导入：
+```javascript
+//第一种方式
+define(['b'],function (b){
+   // b.js加载完成后 会执行这个函数
+   console.log(b)
+})
+
+// 第二种方式，类似cjs
+
+define(function (require,exports,module){
+   //这里导入b
+   var b = require("b")
+   console.log('b：',b)
+
+})
+
+```
+
+#### CMD
+Common Module Definition 公共模块定义规范
+
+sea.js 实现了CMD规范，CMD就是更类似于CJS规范
+
+使用方法：
+
+```html
+<script src='./sea.js' ></script>
+<script>
+   // 声明入口文件
+   seajs.use("./index.js")
+</script>
+```
+
+导出：
+```javascript
+define(function (require,exports,module){
+   moudule.exports = {
+      name:'b模块',
+      data:'b模块的数据'
+   }
+})
+
+```
+导入：
+```javascript
+define(function (require,exports,module){
+   // 同步导入b
+   var b = require("b")
+   // 异步导入
+   require.async("a",function(a) {
+      console.log(a)
+   })
+   
+})
+
+```
 
 ## pnpm + monorepo （待完善）
 

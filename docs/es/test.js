@@ -46,3 +46,4 @@ var Product = (function () {
 })
 
 new Product("Bread", 1.5, 5)
+

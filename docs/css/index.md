@@ -41,3 +41,12 @@ Canvas本质上就是图片，了解了图片不清晰的原因就知道怎么�
 
 ## Tailwind CSS
 
+官网：https://tailwindcss.com/docs/installation/using-vite
+
+### 与vue结合
+
+1. 安装依赖：`npm install -D tailwindcss postcss autoprefixer`
+2. 初始化：`npx tailwindcss init -p`
+3. 配置：`tailwind.config.js` 里告诉框架我们的哪一些代码里的HTML的元素需要识别它的这个class，告诉它哪些是需要转的。
+4.
+5. 在template中使用
