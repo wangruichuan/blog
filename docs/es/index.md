@@ -172,8 +172,6 @@ https://www.bilibili.com/video/BV11uK3zqEHv/?spm_id_from=333.1387.favlist.conten
 
 https://www.bilibili.com/video/BV1hwTkzqEHg/
 
-
-
 ## 函数中的 this 指向
 
 ### 基本知识
@@ -390,21 +388,55 @@ https://www.bilibili.com/video/BV1jUPyeXE58/
 
 ```javascript
 // 第一种方法
-function isArray(obj){
-  return obj instanceof Array
+function isArray(obj) {
+  return obj instanceof Array;
 }
 
 //第二种方法:native code
-Array.isArray()
-
-
-
+Array.isArray();
 ```
 
 ### 手写 deepClone（TODO）
 
 https://www.bilibili.com/video/BV1m2zwYoEz2/
 https://www.bilibili.com/video/BV1tz42187Ln/
+
+做法：
+
+1. 循环＋递归：正统做法
+2. 利用标签页通信里的深拷贝，但这个是异步的，比较耗时
+3. `structuredClone()` : ES2023
+
+````javascript
+// 缓存解决深度克隆
+const cache = new WeakMap();
+
+function deepClone(value) {
+  // 基本数据类型，或者如果value是一个函数的话， 直接返回
+  // typeof null 也是"object"
+  if (typeof value !== "object" || value === null) {
+    return value;
+   }
+   const cached = cache.get(value);
+   if (cached) {
+    return cached;
+   }
+
+   const result = Array.isArray(value) ? [] : {};
+
+  // 设置原型
+  Objetc.setPrototypeOf(result, Object.getPrototypeOf(value));
+  cache.set(value, result);
+   for (const key in value) {
+    // 不去克隆原型上的
+    if (value.hasOwnProperty(key)) {
+    result[key] = deepClone(value[key]);
+    };
+   }
+   return result;
+}
+``
+
 
 ### 数组的并集、交集、差集
 
@@ -431,76 +463,74 @@ Array.prototype.myForEach = function (callback) {
     }
   }
 };
-```
+````
 
 ### 防抖 debounce
 
 定义：在事件被触发 n 秒后再执行回调，如果在这 n 秒内事件又被触发，则重新计时。可以理解为 打断回城。
 
 防抖使用场景三要素：
+
 1. 函数高频调用
 2. 这个函数是一个耗时的操作
 3. 以最后一次调用为准
 
-
 ```javascript
-function debounce(fn,delay){
-    let timer = null
-    return function(...args){
-        clearTimeout(timer)
-        timer = setTimeout(()=>{
-            fn.apply(this,args)
-        },delay)
-    }
+function debounce(fn, delay) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
 }
 
-function fn(){
-    console.log('hello') 
+function fn() {
+  console.log("hello");
 }
 
-let debounceFn = debounce(fn,1000)
-window.onresize = debounceFn
+let debounceFn = debounce(fn, 1000);
+window.onresize = debounceFn;
 ```
 
 ### 节流 throttle
 
- 规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。可以理解为 等待闪现CD
+规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。可以理解为 等待闪现 CD
 
 ```javascript
 function throttle(fn, time) {
-    let timer = null;
-    return function (...args) {
-        if(timer) return;
-        fn.apply(this, args);
-        timer = setTimeout(() => {
-            timer = null;
-        }, time);
-    }    
+  let timer = null;
+  return function (...args) {
+    if (timer) return;
+    fn.apply(this, args);
+    timer = setTimeout(() => {
+      timer = null;
+    }, time);
+  };
 }
 
-const interval = 5000
+const interval = 5000;
 const fn = throttle(() => {
-    console.log(new Date());
+  console.log(new Date());
 }, interval);
 
 setInterval(() => {
-    fn()
+  fn();
 }, 10);
-
 
 // 第二种 函数节流的实现;记录上次的事件
 
-function throttle2(fn,time){
-    let pre = Data.now()
-    return function(...args){
-        let now = Date.now()
-        if(now - pre >= time){
-            fn.apply(this,args)
-            pre = Date.now()
-        }
+function throttle2(fn, time) {
+  let pre = Data.now();
+  return function (...args) {
+    let now = Date.now();
+    if (now - pre >= time) {
+      fn.apply(this, args);
+      pre = Date.now();
     }
+  };
 }
-
 ```
 
 ## 面向对象
@@ -715,9 +745,6 @@ new Product("Bread", 1.5, 5);
 
 因为 JS 的计算和浏览器的渲染都在一个主线程内。
 
-
-
-
 #### 优先级
 
 任务没有优先级，但消息队列是有优先级的
@@ -745,7 +772,6 @@ Promise 的出现统一了 JS 中的异步实现方案，减少了心智负担�
 ● catch
 ● finally
 
-
 `静态方法`
 
 - any
@@ -754,8 +780,8 @@ Promise 的出现统一了 JS 中的异步实现方案，减少了心智负担�
 - allSelected
 - resolve
 - reject
-- try：使用场景：就是一个函数，它返回的有可能是promise，也有可能不是，这时候就可以用try
-![](https://pic1.imgdb.cn/item/68a5386a58cb8da5c83bb5b6.png)
+- try：使用场景：就是一个函数，它返回的有可能是 promise，也有可能不是，这时候就可以用 try
+  ![](https://pic1.imgdb.cn/item/68a5386a58cb8da5c83bb5b6.png)
 - retry
 
 ```javascript
@@ -769,10 +795,10 @@ class MyPromise {
   #handlers = [];
 
   constructor(executor) {
-    const resolve = (data) => {
+    const resolve = data => {
       this.#changeState(FULFILLED, data);
     };
-    const reject = (reason) => {
+    const reject = reason => {
       this.#changeState(REJECTED, reason);
     };
     try {
@@ -826,9 +852,9 @@ class MyPromise {
         const data = callback(this.#result);
         //  判断返回值是否是 promise
         if (this.#isPromiseLike(data)) {
-            queueMicrotask(() => {
-              data.then(resolve, reject)
-            })
+          queueMicrotask(() => {
+            data.then(resolve, reject);
+          });
         } else {
           // 最关键的一点，然后就是把结果传递给下一个then的resolve
           resolve(data);
@@ -850,7 +876,6 @@ class MyPromise {
     return false;
   }
 
-
   // promise A + 中没有的，Es6 新增的
   catch(onRejected) {
     return this.then(undefined, onRejected);
@@ -858,11 +883,11 @@ class MyPromise {
 
   finally(callback) {
     return this.then(
-      (data) => {
+      data => {
         callback();
         return data;
       },
-      (reason) => {
+      reason => {
         callback();
         throw reason;
       }
@@ -917,7 +942,7 @@ class MyPromise {
       count++;
       // 这里是防止传入的不是promise数组，先把它变成promise
       MyPromise.resolve(prom).then(
-        (data) => {
+        data => {
           result[index] = data;
           fulfilledCount++;
           if (fulfilledCount === count) {
@@ -925,7 +950,7 @@ class MyPromise {
             _resolve(result);
           }
         },
-        (err) => {
+        err => {
           _reject(err);
         }
       );
@@ -943,12 +968,10 @@ class MyPromise {
   // 当所有输入 Promise 都被拒绝（包括传递了空的可迭代对象）时，它会以一个包含拒绝原因数组的 AggregateError 拒绝。
   static any(proms) {
     let _reject, _resolve;
-    const p = new MyPromise(
-      (resolve, reject) => {
-        _resolve = resolve;
-        _reject = reject;
-      }
-    )
+    const p = new MyPromise((resolve, reject) => {
+      _resolve = resolve;
+      _reject = reject;
+    });
     // 记录每个promise失败原因的数组
     const errorArr = [];
     let rejectedCount = 0;
@@ -957,27 +980,27 @@ class MyPromise {
     let i = 0;
     let count = 0;
     for (const prom of proms) {
-        const index = i;
-        i++;
-        count++;
-        MyPromise.resolve(prom).then(
-            (data) => {
-              _resolve(data);
-            },
-            (err) => {
-              errorArr[index] = err;
-              rejectedCount++
-              if (rejectedCount === count) {
-                // 说明所有的promise都已经执行完毕了
-                _reject(errorArr);
-              }
-            }
-          );
+      const index = i;
+      i++;
+      count++;
+      MyPromise.resolve(prom).then(
+        data => {
+          _resolve(data);
+        },
+        err => {
+          errorArr[index] = err;
+          rejectedCount++;
+          if (rejectedCount === count) {
+            // 说明所有的promise都已经执行完毕了
+            _reject(errorArr);
+          }
+        }
+      );
     }
     if (count === 0) {
-        //如果是一个空数组
-        _reject("你传的是一个空数组")
-      }
+      //如果是一个空数组
+      _reject("你传的是一个空数组");
+    }
 
     return p;
   }
@@ -992,36 +1015,41 @@ class MyPromise {
     });
     for (const prom of proms) {
       MyPromise.resolve(prom).then(
-        (data) => {
+        data => {
           _resolve(data);
-        }, (err) => {
-          _reject(err)
+        },
+        err => {
+          _reject(err);
         }
-      ) 
+      );
     }
-    return p
+    return p;
   }
 }
 
+MyPromise.resolve()
+  .then(() => {
+    console.log(0);
+    return MyPromise.resolve(4);
+  })
+  .then(res => {
+    console.log(res);
+  });
 
-MyPromise.resolve().then(() => {
-  console.log(0);
-  return MyPromise.resolve(4);
-}).then((res) => {
-  console.log(res); 
-})
-
-MyPromise.resolve().then(() => {
-  console.log(1); 
-}).then(() => {
-  console.log(2); 
-}).then(() => {
-  console.log(3); 
-}).then(() => {
-  console.log(5); 
-})
+MyPromise.resolve()
+  .then(() => {
+    console.log(1);
+  })
+  .then(() => {
+    console.log(2);
+  })
+  .then(() => {
+    console.log(3);
+  })
+  .then(() => {
+    console.log(5);
+  });
 ```
-
 
 ### async/await
 
@@ -1031,52 +1059,51 @@ yield：可以理解为 generator 生成器 的语法糖
 
 这里可以去看 babel 将 async/await 转译后的源码
 
-
-1. 返回的不是promise时
+1. 返回的不是 promise 时
 
 ```javascript
-async function a(){
-  return 1
+async function a() {
+  return 1;
 }
 
 //相当于
 
-async function a(){
-  return Promise.resolve(1)
+async function a() {
+  return Promise.resolve(1);
 }
 ```
-2. await 后面不是promise时
 
+2. await 后面不是 promise 时
 
 ```javascript
-async function a(){
-  await 1
+async function a() {
+  await 1;
 }
 //相当于
-async function a(){
-  await Promise.resolve(1)
+async function a() {
+  await Promise.resolve(1);
 }
 ```
 
-3. await的作用
+3. await 的作用
 
-只要后面的Promise完成，就立即把之后的代码推入微队列，即使后面显式的没代码，否则就卡住
+只要后面的 Promise 完成，就立即把之后的代码推入微队列，即使后面显式的没代码，否则就卡住
 
 ```javascript
-async function a(){
-  await 1
+async function a() {
+  await 1;
 }
 
 // 等价于
-async function a(){
-  await 1
-  return undefined
+async function a() {
+  await 1;
+  return undefined;
 }
 
 // 等价于
-async function a(){
-  await 1
-  return Promise.resolve()
+async function a() {
+  await 1;
+  return Promise.resolve();
 }
 ```
 
@@ -1340,49 +1367,46 @@ https://www.bilibili.com/video/BV1A6hAzrEhL/
 
 其实轮询也行：自动检测更新 - https://www.bilibili.com/video/BV17ih7z6EXy/
 
-
 ## Set
 
 ### 手写版本
 
 ```javascript
 class MySet {
-    #data = [];
-    *[Symbol.iterator](){
-        for (const item of this.#data) {
-            yield item; 
-        }
+  #data = [];
+  *[Symbol.iterator]() {
+    for (const item of this.#data) {
+      yield item;
     }
-    constructor(iterator = []) {
-        // 验证是否是一个可迭代对象
-        if (typeof iterator[Symbol.iterator] !== "function") {
-            throw new TypeError(`${iterator} is not iterable`);
-        }
-
-        for (const item of iterator) {
-            this.add(item);
-        }
-    }
-    get size(){
-        return this.#data.length;
-    }
-    add(data) {
-        if (!this.has(data)) {
-            this.#data.push(data);
-        }
-
-    }
-    has(data) {
-        return this.#data.includes(data);  
-    }
-    delete(data) {
-        const index = this.#data.indexOf(data);
-        if (index === -1) return false;
-        this.#data.splice(index, 1); 
-    }
-    clear() {
-        this.#data.length = 0; 
+  }
+  constructor(iterator = []) {
+    // 验证是否是一个可迭代对象
+    if (typeof iterator[Symbol.iterator] !== "function") {
+      throw new TypeError(`${iterator} is not iterable`);
     }
 
+    for (const item of iterator) {
+      this.add(item);
+    }
+  }
+  get size() {
+    return this.#data.length;
+  }
+  add(data) {
+    if (!this.has(data)) {
+      this.#data.push(data);
+    }
+  }
+  has(data) {
+    return this.#data.includes(data);
+  }
+  delete(data) {
+    const index = this.#data.indexOf(data);
+    if (index === -1) return false;
+    this.#data.splice(index, 1);
+  }
+  clear() {
+    this.#data.length = 0;
+  }
 }
 ```

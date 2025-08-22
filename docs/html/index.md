@@ -33,7 +33,7 @@ https://www.bilibili.com/video/BV1shRnYyEkr/
 
 ## 文件预览
 
-文件预览没有银弹。实现方式强依赖于文件类型。
+文件预览实现方式强依赖于文件类型。
 
 - 浏览器原生支持类型：图片、PDF、文本、音视频
 - 前端库解析型：docx，markdown
@@ -163,3 +163,11 @@ export function listenMsg(callback){
 
 
 https://www.bilibili.com/video/BV133PherEn4/
+
+
+
+## 监听元素重叠度 Intersection Observer API
+
+可以用来实现 “查看更多” 这个功能
+
+https://www.bilibili.com/video/BV1rEcie8EYc/

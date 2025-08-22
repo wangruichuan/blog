@@ -6,6 +6,7 @@
 - [杂七杂八](other/index.md)
 - [六年之约](other/express.md)
 - [JS](es/index.md)
+- [Node](es/node.md)
 - [CSS](css/index.md)
 - [浏览器/HTML](html/index.md)
 - [Git](other/git.md)
