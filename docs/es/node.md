@@ -1,4 +1,9 @@
 > 小满zs - node ：该看p4
+## Node 官网
+
+https://nodejs.org/zh-cn
+
+该看：第二节，How much JavaScript do you need to know to use Node.js?
 
 ## Node的作用
 

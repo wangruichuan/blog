@@ -454,4 +454,235 @@ function getFib(n) {
 至此，动态规划的理论与例题部分就已经结束了，通过以上内容，我们已经掌握了动态规划的最基本的一些思想和理论，当然，关于动态规划还有很多的知识点。
 
 
-## A*寻路算法
+## A*寻路算法 (TODO)
+
+
+## 二叉树
+
+### 基础知识
+
+1. **数据结构基础**
+
+```javascript
+class TreeNode {
+  constructor(val, left, right) {
+    this.val = (val === undefined ? 0 : val);
+    this.left = (left === undefined ? null : left);
+    this.right = (right === undefined ? null : right);
+  }
+}
+// 创建一个简单的树：
+//   1
+//  / \
+// 2   3
+const root = new TreeNode(1);
+root.left = new TreeNode(2);
+root.right = new TreeNode(3);
+```
+
+2. 核心操作：**二叉树的遍历**。分为递归与非递归
+   1. 深度优先搜索（DFS）​:
+      1. ​前序遍历​：根 -> 左 -> 右
+         1. ​应用​：深度复制一棵树、序列化、显示目录结构。
+      2. ​中序遍历​：左 -> 根 -> 右
+         1. ​应用​：在二叉搜索树（BST）​​ 中得到升序序列。
+      3. ​后序遍历​：左 -> 右 -> 根
+         1. ​应用​：计算子树的大小、释放二叉树的内存（必须先释放子节点再释放根）。
+   2. ​广度优先搜索（BFS / 层次遍历）​:
+      1. 使用队列（Queue）​​ 实现。在 JavaScript 中可以用数组的 push和 shift方法模拟。
+      2. ​应用​：按层处理节点、求树的深度、找最短路径（在树中）。
+  
+### 延伸知识
+1. 特殊的二叉树​
+   1. ​二叉搜索树（BST）​​：**左子树所有节点 < 根节点 < 右子树所有节点**。时间复杂度：O(logN)
+      1. ​中序遍历的结果是升序数组。这是最重要的特性，很多题目都围绕它展开。
+   2. ​平衡二叉树（如AVL树、红黑树）​​：左子树和右子树的高度的绝对值的差不超过1.
+      1. 主要保证树的高度不会过高，查询效率稳定。力扣中常出现的是平衡二叉搜索树。
+   3. ​完全二叉树 & 满二叉树​：与堆的结构密切相关，常用于优先级队列/堆排序。
+      1. 满二叉树：数量 = `2^h - 1`
+      2. 完全二叉树：除了底层外，其他层都是满的，底层是从左到右连续的。
+   
+2. 算法技巧
+   1. ​分治法​：将大问题（整棵树）分解为小问题（左子树和右子树），分别解决后再合并结果。这是解决二叉树问题的核心思想。
+   2. ​回溯法​：在遍历时记录路径，并在退回时撤销选择（例如，从路径数组中 pop掉当前节点）。常用于路径总和这类问题。
+3. 以数组形式去存储二叉树时：
+   ![](https://pic1.imgdb.cn/item/68abb3f758cb8da5c8493b8d.png)
+
+   - 左孩子：**2 * i + 1**
+   - 右孩子：**2 * i + 2**
+
+
+
+### 刷题顺序
+
+好的，这是为您重新排版的二叉树刷题顺序清单，格式更清晰，便于查阅和跟踪进度。
+
+二叉树刷题顺序指南 (JavaScript)
+
+1. 基础遍历 (必须熟练掌握)
+
+   • https://leetcode.cn/problems/binary-tree-preorder-traversal/ (前序)
+
+   • https://leetcode.cn/problems/binary-tree-inorder-traversal/ (中序)
+
+   • https://leetcode.cn/problems/binary-tree-postorder-traversal/ (后序)
+
+   • https://leetcode.cn/problems/binary-tree-level-order-traversal/ (层序)
+
+2. 简单属性与操作 (巩固递归和分治思想)
+
+   • https://leetcode.cn/problems/maximum-depth-of-binary-tree/ (分治法经典入门)
+
+   • https://leetcode.cn/problems/same-tree/ (相同的树)
+
+   • https://leetcode.cn/problems/invert-binary-tree/ (翻转二叉树超级经典)
+
+   • https://leetcode.cn/problems/symmetric-tree/ ( 对称二叉树)
+
+   • https://leetcode.cn/problems/path-sum/ (二叉搜索树的最近公共祖先)
+
+3. 二叉搜索树 (BST) (理解中序遍历特性)
+
+   • https://leetcode.cn/problems/search-in-a-binary-search-tree/ 
+
+   • https://leetcode.cn/problems/validate-binary-search-tree/ (中序遍历特性)
+
+   • https://leetcode.cn/problems/minimum-absolute-difference-in-bst/ (中序遍历特性)
+
+   • https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-search-tree/
+
+4. 构造与序列化 (提升综合应用能力)
+
+   • https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/
+
+   • https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/ (经典难题)
+
+   • https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/
+
+5. 进阶问题 (挑战高频难题)
+
+   • https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/ (非常高频)
+
+   • https://leetcode.cn/problems/binary-tree-maximum-path-sum/ (困难但经典)
+
+建议：
+ - 按顺序逐个专题攻克，确保掌握一类问题后再进入下一类。
+ - 每道题尝试用递归和迭代两种方法实现（尤其是遍历题）。
+ - 做好总结，记录解题思路和易错点。
+
+### 递归遍历
+
+1. 前序
+```javascript
+var preorderTraversal = function(root) {
+    const result = [];
+    
+    const traverse = (node) => {
+        if (node === null) return; // 递归终止条件
+        result.push(node.val);     // 访问根节点
+        traverse(node.left);       // 遍历左子树
+        traverse(node.right);      // 遍历右子树
+    };
+    
+    traverse(root);
+    return result;
+};
+```
+
+2. 中序
+
+```javascript
+var inorderTraversal = function(root) {
+    const result = [];
+    
+    const traverse = (node) => {
+        if (node === null) return;
+        traverse(node.left);       // 遍历左子树
+        result.push(node.val);     // 访问根节点
+        traverse(node.right);      // 遍历右子树
+    };
+    
+    traverse(root);
+    return result;
+};
+```
+
+3. 后序
+
+```javascript
+var postorderTraversal = function(root) {
+    const result = [];
+    
+    const traverse = (node) => {
+        if (node === null) return;
+        traverse(node.left);       // 遍历左子树
+        traverse(node.right);      // 遍历右子树
+        result.push(node.val);     // 访问根节点
+    };
+    
+    traverse(root);
+    return result;
+};
+```
+
+### 层序遍历
+
+1. 返回一维数组版本
+
+```javascript
+var levelOrder = function(root) {
+    if (root === null) return [];
+    
+    const result = [];
+    const queue = [root]; // 初始化队列，放入根节点
+    
+    while (queue.length > 0) {
+        const currentNode = queue.shift(); // 从队列头部取出节点
+        result.push(currentNode.val);      // 访问该节点
+        
+        // 将该节点的子节点按顺序加入队列尾部
+        if (currentNode.left !== null) {
+            queue.push(currentNode.left);
+        }
+        if (currentNode.right !== null) {
+            queue.push(currentNode.right);
+        }
+    }
+    
+    return result;
+};
+```
+2. 返回二维数组版本
+
+```javascript
+
+var levelOrder = function(root) {
+    if (root === null) return [];
+    
+    const result = [];
+    const queue = [root];
+    
+    while (queue.length > 0) {
+        const levelSize = queue.length; // 当前层的节点数
+        const currentLevel = [];        // 存储当前层的节点值
+        
+        // 处理当前层的所有节点
+        for (let i = 0; i < levelSize; i++) {
+            const currentNode = queue.shift();
+            currentLevel.push(currentNode.val);
+            
+            // 将下一层的节点加入队列
+            if (currentNode.left !== null) {
+                queue.push(currentNode.left);
+            }
+            if (currentNode.right !== null) {
+                queue.push(currentNode.right);
+            }
+        }
+        
+        result.push(currentLevel); // 将当前层加入结果
+    }
+    
+    return result;
+};
+```
