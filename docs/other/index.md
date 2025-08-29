@@ -1,3 +1,23 @@
+## Mermaid教程
+
+官网：https://mermaid.js.org/
+
+```html
+<div class="mermaid">
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+</div>
+```
+<div class="mermaid">
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+</div>
+
+
 ## 记录一次腾讯的开源经历 -- cherry-markdown
 
 ### 背景
