@@ -1889,6 +1889,66 @@ Head 3：逻辑关系视角 —— “它”关注“因为”，模型试图理
 
 学习阶段选择本地部署，部署一个功能不太强的模型。
 
-Ollama 是一个开源的大语言模型**运行平台**，提供简洁易用的 命令行工具 和 REST API，帮助用户在本地轻松下载、部署和运行各种开源的 LLM（大语言模型），本地会启动一个 Web 服务，监听 11434 端口
+Ollama 是一个开源的大语言模型**运行平台**，提供简洁易用的 命令行工具 和 REST API，帮助用户在本地轻松下载、部署
+和运行各种开源的 LLM（大语言模型），本地会启动一个 Web 服务，监听 11434 端口
 
-### 
+
+
+## RAG
+
+## AI赋能
+
+![](https://pic1.imgdb.cn/item/68b4e55a58cb8da5c8683158.png)
+
+![](https://pic1.imgdb.cn/item/68b4e70f58cb8da5c8683194.png)
+
+
+### 安装模型
+
+#### ollama
+
+Ollama 是一个开源的**大语言模型运行平台**，提供简洁易用的 命令行工具 和 REST API，帮助用户在本地轻松下载、部署和运行各种开源的 LLM（大语言模型），提供 REST API，本地会启动一个 Web 服务，监听 `11434` 端口.
+
+
+默认的安装位置：
+
+![](https://pic1.imgdb.cn/item/68b4ea6958cb8da5c868320b.png)
+
+下载模型：
+
+![](https://pic1.imgdb.cn/item/68b4e9fe58cb8da5c8683201.png)
+
+既是下载，也是安装：`ollama run qwen3:0.6b`, 下载是支持断点续传的
+
+
+常用命令：
+
+1. ollama list：查看已下载模型
+2. ollama show <模型名称>：显示模型信息
+3. ollama pull <模型名称>：拉取最新的模型，可以用于更新操作
+4. ollama rm <模型名称>：删除模型
+5. ollama run <模型名称>：拉取并且运行模型
+    - 存在：直接运行模型
+    - 不存在：先拉取下来，然后运行
+    - `ollama run <模型名称> --verbose`：查看每次对话后模型执行的效率细节
+6. /clear：清空上下文
+
+
+
+如何开启多行对话？
+
+> 使用 `"""` 来开启多行对话，把要说的给包裹住
+> ![](https://pic1.imgdb.cn/item/68b4f2d658cb8da5c86837f5.png)
+
+
+自定义模型
+
+- 需要自定义一个 modelfile 文件，在文件中设置参数和提示模版相关内容
+- ollama create <模型名称> -f <modelfile文件地址>
+
+### 基于LangChainJS的开发
+
+
+![](https://pic1.imgdb.cn/item/68b5089858cb8da5c868784f.png)
+
+
