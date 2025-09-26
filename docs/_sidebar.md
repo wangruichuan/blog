@@ -1,6 +1,7 @@
 
 - [算法](algorithm/index.md)
 - [AI](ai/index.md)
+- [Python](python/index.md)
 - [Vue](vue/index.md)
 - [工程化](gongchenghua/index.md)
 - [杂七杂八](other/index.md)
@@ -10,6 +11,7 @@
 - [CSS](css/index.md)
 - [浏览器/HTML](html/index.md)
 - [Git](other/git.md)
-- [运维](gongchenghua/yunwei.md)
+- [Linux运维](gongchenghua/yunwei.md)
+- [苦手指北](game/lol.md)
 - [英语](language/english.md)
-- [日语](language/japanese.md)
+- [日语 TODO](language/japanese.md)

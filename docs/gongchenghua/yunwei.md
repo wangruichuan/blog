@@ -48,3 +48,34 @@ https://v.douyin.com/SAlJzwvdcE4/
 8. Turnstile：又叫 Cloudflare五秒盾，可以为网站添加一个反爬虫人机验证功能
 9. Images：图像处理
 10. 无限邮箱
+
+## Tmux
+
+全称：Terminal Multiplexe 
+
+通常一个terminal同一时间只会运行一个程序
+
+tmux创建出来的进程以及窗口布局等信息被保存在session中，当用户关闭窗口时，tmux也会跟着退出，但session和其中的进程会继续运行，下次进入tmux可以选择重新进入session。
+
+当我们不带参数调用 tmux 调用时，tmux会创建一个新的session，并且在session中创建一个默认的shell，当前正在运行的程序的名字会在状态栏显示出来
+
+![](https://pic1.imgdb.cn/item/68c9edd2c5157e1a880efd26.png)
+
+
+ctrl + b % — 左右分屏
+ctrl + b “ — 上下分屏
+ctrl + b 光标 — 切换焦点（按住CT+B不放是调大小，按下松开再方向键是切换窗口）
+ctrl + b c — 创建window (带星号的是当前正在显示的window)
+ctrl + b 数字 — 切换window
+ctrl + b d — 退出tmux
+
+tmux — 创建session
+tmux new -s wang — 创建session，并命名为wang
+tmux ls — 列出session
+tmux a -t 0 — 重新进入名字为0的sessin
+tmux a — 重新进入最新的session
+tmux kill-session -t 0 — 退出session 0
+
+~/.tmux.conf — 配置文件
+set -g mouse on — 开启鼠标支持
+set -g prefix C-s — ctrl + b前缀改成ctrl + s
